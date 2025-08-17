@@ -8,10 +8,20 @@ channel = "stable-25_05"
 run = ["sh", "-c", "npm run dev"]
 
 [workflows]
+runButton = "Start Backend"
 
 [[workflows.workflow]]
 name = "Backend Dev"
 author = 46518224
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd backend && npm run dev"
+
+[[workflows.workflow]]
+name = "Start Backend"
+author = 46518911
 mode = "sequential"
 
 [[workflows.workflow.tasks]]

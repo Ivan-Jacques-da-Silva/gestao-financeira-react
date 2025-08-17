@@ -2,7 +2,7 @@
 import React from 'react'
 import { IconeEditar, IconeExcluir } from './Icones.jsx'
 
-export default function ListaGastosFixos({ gastosFixos, onEditar, onExcluir }) {
+export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir }) {
   const formatarValor = (valor) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -19,7 +19,7 @@ export default function ListaGastosFixos({ gastosFixos, onEditar, onExcluir }) {
         </div>
       ) : (
         <div className="lista">
-          {gastosFixos.map(gastoFixo => (
+          {Array.isArray(gastosFixos) && gastosFixos.map(gastoFixo => (
             <div key={gastoFixo.id} className={`item-lista ${!gastoFixo.ativo ? 'inativo' : ''}`}>
               <div className="item-info">
                 <div className="item-titulo">

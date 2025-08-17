@@ -1,8 +1,7 @@
-
 import React from 'react'
 import { IconeEditar, IconeExcluir } from './Icones.jsx'
 
-export default function ListaGastos({ gastos, onEditar, onExcluir }) {
+export default function ListaGastos({ gastos = [], onEditar, onExcluir }) {
   const formatarValor = (valor) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',

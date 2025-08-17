@@ -32,20 +32,32 @@ export default function App(){
   const carregarGastos = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/gastos`)
-      const data = await response.json()
-      setGastos(data)
+      if (response.ok) {
+        const data = await response.json()
+        setGastos(Array.isArray(data) ? data : [])
+      } else {
+        console.error('Erro ao carregar gastos:', response.status)
+        setGastos([])
+      }
     } catch (error) {
       console.error('Erro ao carregar gastos:', error)
+      setGastos([])
     }
   }
 
   const carregarGastosFixos = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/gastos-fixos`)
-      const data = await response.json()
-      setGastosFixos(data)
+      if (response.ok) {
+        const data = await response.json()
+        setGastosFixos(Array.isArray(data) ? data : [])
+      } else {
+        console.error('Erro ao carregar gastos fixos:', response.status)
+        setGastosFixos([])
+      }
     } catch (error) {
       console.error('Erro ao carregar gastos fixos:', error)
+      setGastosFixos([])
     }
   }
 
