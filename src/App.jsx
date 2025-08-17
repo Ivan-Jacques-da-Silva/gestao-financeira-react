@@ -2,11 +2,23 @@ import React, { useState } from 'react'
 import CardKPI from './componentes/CardKPI.jsx'
 import GraficoPizza from './componentes/GraficoPizza.jsx'
 import GraficoLinha from './componentes/GraficoLinha.jsx'
+import FormularioGasto from './componentes/FormularioGasto.jsx'
+import ListaGastos from './componentes/ListaGastos.jsx'
+import FormularioGastoFixo from './componentes/FormularioGastoFixo.jsx'
+import ListaGastosFixos from './componentes/ListaGastosFixos.jsx'
 import { IconeCartao, IconeGrafico, IconeSeta, IconeAlerta, IconeOlho } from './componentes/Icones.jsx'
 
 export default function App(){
   const [aba,setAba] = useState('dashboard')
   const [mostrar,setMostrar] = useState(false)
+  
+  // Estados para gastos e parcelas
+  const [gastos, setGastos] = useState([])
+  const [gastoEdicao, setGastoEdicao] = useState(null)
+  
+  // Estados para gastos fixos
+  const [gastosFixos, setGastosFixos] = useState([])
+  const [gastoFixoEdicao, setGastoFixoEdicao] = useState(null)
 
   const dadosPizza = [
     { rotulo: 'Cartão de Crédito', valor: 1200 },
@@ -15,6 +27,54 @@ export default function App(){
     { rotulo: 'Débito', valor: 300 }
   ]
   const dadosLinha = [300, 520, 410, 760, 640, 880]
+
+  // Funções para gastos
+  const salvarGasto = (gasto) => {
+    if (gastoEdicao) {
+      setGastos(gastos.map(g => g.id === gasto.id ? gasto : g))
+      setGastoEdicao(null)
+    } else {
+      setGastos([...gastos, gasto])
+    }
+  }
+
+  const editarGasto = (gasto) => {
+    setGastoEdicao(gasto)
+  }
+
+  const excluirGasto = (id) => {
+    if (confirm('Deseja realmente excluir este gasto?')) {
+      setGastos(gastos.filter(g => g.id !== id))
+    }
+  }
+
+  const cancelarEdicaoGasto = () => {
+    setGastoEdicao(null)
+  }
+
+  // Funções para gastos fixos
+  const salvarGastoFixo = (gastoFixo) => {
+    if (gastoFixoEdicao) {
+      setGastosFixos(gastosFixos.map(g => g.id === gastoFixo.id ? gastoFixo : g))
+      setGastoFixoEdicao(null)
+    } else {
+      setGastosFixos([...gastosFixos, gastoFixo])
+    }
+  }
+
+  const editarGastoFixo = (gastoFixo) => {
+    setGastoFixoEdicao(gastoFixo)
+  }
+
+  const excluirGastoFixo = (id) => {
+    if (confirm('Deseja realmente excluir este gasto fixo?')) {
+      setGastosFixos(gastosFixos.filter(g => g.id !== id))
+    }
+  }
+
+  const cancelarEdicaoGastoFixo = () => {
+    setGastoFixoEdicao(null)
+  }
 
   return (
     <div className="container">
@@ -94,11 +154,41 @@ export default function App(){
       )}
 
       {aba==='gastos' && (
-        <div className="card"><h4>Gastos e Parcelas</h4><div className="sub">Em breve: listagem de gastos e detalhamento.</div></div>
+        <div className="grid" style={{gridTemplateColumns:'repeat(12,1fr)'}}>
+          <div style={{gridColumn:'span 5'}}>
+            <FormularioGasto
+              gasto={gastoEdicao}
+              onSalvar={salvarGasto}
+              onCancelar={cancelarEdicaoGasto}
+            />
+          </div>
+          <div style={{gridColumn:'span 7'}}>
+            <ListaGastos
+              gastos={gastos}
+              onEditar={editarGasto}
+              onExcluir={excluirGasto}
+            />
+          </div>
+        </div>
       )}
 
       {aba==='fixos' && (
-        <div className="card"><h4>Gastos Fixos</h4><div className="sub">Em breve: cadastro e visualização de contas fixas.</div></div>
+        <div className="grid" style={{gridTemplateColumns:'repeat(12,1fr)'}}>
+          <div style={{gridColumn:'span 5'}}>
+            <FormularioGastoFixo
+              gastoFixo={gastoFixoEdicao}
+              onSalvar={salvarGastoFixo}
+              onCancelar={cancelarEdicaoGastoFixo}
+            />
+          </div>
+          <div style={{gridColumn:'span 7'}}>
+            <ListaGastosFixos
+              gastosFixos={gastosFixos}
+              onEditar={editarGastoFixo}
+              onExcluir={excluirGastoFixo}
+            />
+          </div>
+        </div>
       )}
     </div>
   )
