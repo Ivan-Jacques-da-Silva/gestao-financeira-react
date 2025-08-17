@@ -6,3 +6,14 @@ channel = "stable-25_05"
 
 [deployment]
 run = ["sh", "-c", "npm run dev"]
+
+[workflows]
+
+[[workflows.workflow]]
+name = "Backend Dev"
+author = 46518224
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd backend && npm run dev"
