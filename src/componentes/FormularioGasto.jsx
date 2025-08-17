@@ -20,11 +20,15 @@ export default function FormularioGasto({ gasto, onSalvar, onCancelar }) {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (formData.descricao && formData.valor && formData.data) {
-      onSalvar({
+      const dadosParaSalvar = {
         ...formData,
-        id: gasto?.id || Date.now(),
-        valor: parseFloat(formData.valor)
-      })
+        valor: parseFloat(formData.valor),
+        parcelas: parseInt(formData.parcelas)
+      }
+      if (gasto) {
+        dadosParaSalvar.id = gasto.id
+      }
+      onSalvar(dadosParaSalvar)
       if (!gasto) {
         setFormData({
           descricao: '',

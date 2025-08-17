@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import CardKPI from './componentes/CardKPI.jsx'
 import GraficoPizza from './componentes/GraficoPizza.jsx'
 import GraficoLinha from './componentes/GraficoLinha.jsx'
@@ -7,6 +7,8 @@ import ListaGastos from './componentes/ListaGastos.jsx'
 import FormularioGastoFixo from './componentes/FormularioGastoFixo.jsx'
 import ListaGastosFixos from './componentes/ListaGastosFixos.jsx'
 import { IconeCartao, IconeGrafico, IconeSeta, IconeAlerta, IconeOlho } from './componentes/Icones.jsx'
+
+const API_BASE_URL = 'http://localhost:5000/api'
 
 export default function App(){
   const [aba,setAba] = useState('dashboard')
@@ -20,6 +22,33 @@ export default function App(){
   const [gastosFixos, setGastosFixos] = useState([])
   const [gastoFixoEdicao, setGastoFixoEdicao] = useState(null)
 
+  // Carregar dados iniciais
+  useEffect(() => {
+    carregarGastos()
+    carregarGastosFixos()
+  }, [])
+
+  // Funções para carregar dados da API
+  const carregarGastos = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/gastos`)
+      const data = await response.json()
+      setGastos(data)
+    } catch (error) {
+      console.error('Erro ao carregar gastos:', error)
+    }
+  }
+
+  const carregarGastosFixos = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/gastos-fixos`)
+      const data = await response.json()
+      setGastosFixos(data)
+    } catch (error) {
+      console.error('Erro ao carregar gastos fixos:', error)
+    }
+  }
+
   const dadosPizza = [
     { rotulo: 'Cartão de Crédito', valor: 1200 },
     { rotulo: 'Pix', valor: 800 },
@@ -29,22 +58,58 @@ export default function App(){
   const dadosLinha = [300, 520, 410, 760, 640, 880]
 
   // Funções para gastos
-  const salvarGasto = (gasto) => {
-    if (gastoEdicao) {
-      setGastos(gastos.map(g => g.id === gasto.id ? gasto : g))
-      setGastoEdicao(null)
-    } else {
-      setGastos([...gastos, gasto])
+  const salvarGasto = async (gasto) => {
+    try {
+      if (gastoEdicao) {
+        const response = await fetch(`${API_BASE_URL}/gastos/${gasto.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(gasto),
+        })
+        if (response.ok) {
+          const gastoAtualizado = await response.json()
+          setGastos(gastos.map(g => g.id === gasto.id ? gastoAtualizado : g))
+          setGastoEdicao(null)
+        }
+      } else {
+        const response = await fetch(`${API_BASE_URL}/gastos`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(gasto),
+        })
+        if (response.ok) {
+          const novoGasto = await response.json()
+          setGastos([...gastos, novoGasto])
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao salvar gasto:', error)
     }
   }
 
   const editarGasto = (gasto) => {
-    setGastoEdicao(gasto)
+    setGastoEdicao({
+      ...gasto,
+      data: new Date(gasto.data).toISOString().split('T')[0]
+    })
   }
 
-  const excluirGasto = (id) => {
+  const excluirGasto = async (id) => {
     if (confirm('Deseja realmente excluir este gasto?')) {
-      setGastos(gastos.filter(g => g.id !== id))
+      try {
+        const response = await fetch(`${API_BASE_URL}/gastos/${id}`, {
+          method: 'DELETE',
+        })
+        if (response.ok) {
+          setGastos(gastos.filter(g => g.id !== id))
+        }
+      } catch (error) {
+        console.error('Erro ao excluir gasto:', error)
+      }
     }
   }
 
@@ -53,12 +118,36 @@ export default function App(){
   }
 
   // Funções para gastos fixos
-  const salvarGastoFixo = (gastoFixo) => {
-    if (gastoFixoEdicao) {
-      setGastosFixos(gastosFixos.map(g => g.id === gastoFixo.id ? gastoFixo : g))
-      setGastoFixoEdicao(null)
-    } else {
-      setGastosFixos([...gastosFixos, gastoFixo])
+  const salvarGastoFixo = async (gastoFixo) => {
+    try {
+      if (gastoFixoEdicao) {
+        const response = await fetch(`${API_BASE_URL}/gastos-fixos/${gastoFixo.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(gastoFixo),
+        })
+        if (response.ok) {
+          const gastoFixoAtualizado = await response.json()
+          setGastosFixos(gastosFixos.map(g => g.id === gastoFixo.id ? gastoFixoAtualizado : g))
+          setGastoFixoEdicao(null)
+        }
+      } else {
+        const response = await fetch(`${API_BASE_URL}/gastos-fixos`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(gastoFixo),
+        })
+        if (response.ok) {
+          const novoGastoFixo = await response.json()
+          setGastosFixos([...gastosFixos, novoGastoFixo])
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao salvar gasto fixo:', error)
     }
   }
 
@@ -66,9 +155,18 @@ export default function App(){
     setGastoFixoEdicao(gastoFixo)
   }
 
-  const excluirGastoFixo = (id) => {
+  const excluirGastoFixo = async (id) => {
     if (confirm('Deseja realmente excluir este gasto fixo?')) {
-      setGastosFixos(gastosFixos.filter(g => g.id !== id))
+      try {
+        const response = await fetch(`${API_BASE_URL}/gastos-fixos/${id}`, {
+          method: 'DELETE',
+        })
+        if (response.ok) {
+          setGastosFixos(gastosFixos.filter(g => g.id !== id))
+        }
+      } catch (error) {
+        console.error('Erro ao excluir gasto fixo:', error)
+      }
     }
   }
 
