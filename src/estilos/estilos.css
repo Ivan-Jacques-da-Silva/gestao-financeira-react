@@ -1081,7 +1081,23 @@ body {
 
   /* Ocultar tabs desktop no mobile */
   .tabs {
-    display: none;
+    display: flex;
+  }
+
+  /* Garantir que tabelas desktop fiquem ocultas no mobile */
+  .tabela {
+    display: none !important;
+  }
+
+  /* Garantir que cards mobile sejam exibidos */
+  .tabela-cards {
+    display: block !important;
+  }
+
+  /* Garantir que o container da tabela seja visível */
+  .tabela-container {
+    display: block !important;
+  }: none;
   }
 
   /* Mostrar menu mobile */
