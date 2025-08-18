@@ -1,5 +1,5 @@
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 
 export default function TelaAuth({ onLogin }) {
   const [modo, setModo] = useState('login') // 'login' ou 'registro'

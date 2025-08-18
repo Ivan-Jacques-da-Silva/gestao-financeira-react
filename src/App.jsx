@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import './estilos/estilos.css'
 import CardKPI from './componentes/CardKPI.jsx'
 import GraficoPizza from './componentes/GraficoPizza.jsx'
