@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { createServer } from "net";
 import gastosRoutes from "./routes/gastos.js";
 import gastosFixosRoutes from "./routes/gastosFixos.js";
+import authRoutes from './routes/auth.js'
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use(express.json());
 // Rotas
 app.use("/api/gastos", gastosRoutes);
 app.use("/api/gastos-fixos", gastosFixosRoutes);
+app.use('/api/auth', authRoutes)
 
 // Rota de teste
 app.get("/api/health", (req, res) => {

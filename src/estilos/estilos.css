@@ -578,7 +578,9 @@ body {
   border-radius: 10px;
   padding: 12px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-  transition: all 0.2s ease;
+  transition: all 0.2s;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .card-item:hover {
@@ -1213,7 +1215,7 @@ body {
     padding: 10px 12px;
   }
 
-  /* Melhorar ainda mais o espaçamento no mobile pequeno */
+  /* Melhorar espaçamento dos campos no mobile */
   /* .campo {
     margin-bottom: 18px;
   } */
@@ -1227,3 +1229,32 @@ body {
     padding: 5px;
   }
 }
+
+.header-usuario {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 14px;
+  color: var(--cor-subtexto);
+}
+
+.botao-logout {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  color: var(--cor-subtexto);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.botao-logout:hover {
+  background: #e5e7eb;
+  color: var(--cor-texto);
+}
+
+/* === NAVEGAÇÃO === */
