@@ -1,13 +1,18 @@
 
 import express from 'express'
 import prisma from '../prisma/client.js'
+import { verificarToken } from '../middleware/auth.js'
 
 const router = express.Router()
 
-// GET - Listar todos os gastos fixos
+// Aplicar middleware de autenticação a todas as rotas
+router.use(verificarToken)
+
+// GET - Listar gastos fixos do usuário
 router.get('/', async (req, res) => {
   try {
     const gastosFixos = await prisma.gastoFixo.findMany({
+      where: { usuarioId: req.usuario.id },
       orderBy: { createdAt: 'desc' }
     })
     res.json(gastosFixos)
@@ -16,11 +21,14 @@ router.get('/', async (req, res) => {
   }
 })
 
-// GET - Buscar gasto fixo por ID
+// GET - Buscar gasto fixo por ID do usuário
 router.get('/:id', async (req, res) => {
   try {
-    const gastoFixo = await prisma.gastoFixo.findUnique({
-      where: { id: parseInt(req.params.id) }
+    const gastoFixo = await prisma.gastoFixo.findFirst({
+      where: { 
+        id: parseInt(req.params.id),
+        usuarioId: req.usuario.id
+      }
     })
     if (!gastoFixo) {
       return res.status(404).json({ error: 'Gasto fixo não encontrado' })
@@ -44,7 +52,8 @@ router.post('/', async (req, res) => {
         diaVencimento: parseInt(diaVencimento),
         categoria,
         ativo: ativo !== undefined ? ativo : true,
-        status: status || 'a_vencer'
+        status: status || 'a_vencer',
+        usuarioId: req.usuario.id
       }
     })
     
@@ -58,6 +67,18 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { descricao, valor, tipo, diaVencimento, categoria, ativo, status } = req.body
+    
+    // Verificar se o gasto fixo pertence ao usuário
+    const gastoFixoExistente = await prisma.gastoFixo.findFirst({
+      where: { 
+        id: parseInt(req.params.id),
+        usuarioId: req.usuario.id
+      }
+    })
+    
+    if (!gastoFixoExistente) {
+      return res.status(404).json({ error: 'Gasto fixo não encontrado' })
+    }
     
     const gastoFixo = await prisma.gastoFixo.update({
       where: { id: parseInt(req.params.id) },
@@ -74,9 +95,6 @@ router.put('/:id', async (req, res) => {
     
     res.json(gastoFixo)
   } catch (error) {
-    if (error.code === 'P2025') {
-      return res.status(404).json({ error: 'Gasto fixo não encontrado' })
-    }
     res.status(500).json({ error: 'Erro ao atualizar gasto fixo' })
   }
 })
@@ -84,14 +102,23 @@ router.put('/:id', async (req, res) => {
 // DELETE - Excluir gasto fixo
 router.delete('/:id', async (req, res) => {
   try {
+    // Verificar se o gasto fixo pertence ao usuário
+    const gastoFixoExistente = await prisma.gastoFixo.findFirst({
+      where: { 
+        id: parseInt(req.params.id),
+        usuarioId: req.usuario.id
+      }
+    })
+    
+    if (!gastoFixoExistente) {
+      return res.status(404).json({ error: 'Gasto fixo não encontrado' })
+    }
+    
     await prisma.gastoFixo.delete({
       where: { id: parseInt(req.params.id) }
     })
     res.status(204).send()
   } catch (error) {
-    if (error.code === 'P2025') {
-      return res.status(404).json({ error: 'Gasto fixo não encontrado' })
-    }
     res.status(500).json({ error: 'Erro ao excluir gasto fixo' })
   }
 })

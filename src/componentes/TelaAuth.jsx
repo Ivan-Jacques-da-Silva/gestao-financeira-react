@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react'
 
 export default function TelaAuth({ onLogin }) {
@@ -37,13 +36,19 @@ export default function TelaAuth({ onLogin }) {
         })
       })
 
-      const data = await response.json()
-
       if (response.ok) {
-        localStorage.setItem('usuario', JSON.stringify(data.usuario))
-        onLogin(data.usuario)
+        const data = await response.json()
+        localStorage.setItem('usuario', JSON.stringify({
+          ...data.usuario,
+          token: data.token
+        }))
+        onLogin({
+          ...data.usuario,
+          token: data.token
+        })
       } else {
-        setErro(data.erro || 'Erro ao fazer login')
+        const errorData = await response.json()
+        setErro(errorData.erro || 'Erro ao fazer login')
       }
     } catch (error) {
       setErro('Erro de conexão')
@@ -66,13 +71,19 @@ export default function TelaAuth({ onLogin }) {
         body: JSON.stringify(dadosRegistro)
       })
 
-      const data = await response.json()
-
       if (response.ok) {
-        localStorage.setItem('usuario', JSON.stringify(data.usuario))
-        onLogin(data.usuario)
+        const data = await response.json()
+        localStorage.setItem('usuario', JSON.stringify({
+          ...data.usuario,
+          token: data.token
+        }))
+        onLogin({
+          ...data.usuario,
+          token: data.token
+        })
       } else {
-        setErro(data.erro || 'Erro ao fazer registro')
+        const errorData = await response.json()
+        setErro(errorData.erro || 'Erro ao registrar usuário')
       }
     } catch (error) {
       setErro('Erro de conexão')

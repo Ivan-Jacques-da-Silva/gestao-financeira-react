@@ -49,9 +49,12 @@ export default function App(){
   const carregarDados = async () => {
     try {
       // Carregar gastos
+      const usuarioAuth = JSON.parse(localStorage.getItem('usuario'));
+      if (!usuarioAuth || !usuarioAuth.token) return;
+
       const responseGastos = await fetch(`${API_BASE_URL}/gastos`, {
         headers: {
-          'Authorization': `Bearer ${JSON.parse(localStorage.getItem('usuario')).token}`
+          'Authorization': `Bearer ${usuarioAuth.token}`
         }
       });
       if (responseGastos.ok) {
@@ -65,7 +68,7 @@ export default function App(){
       // Carregar gastos fixos
       const responseGastosFixos = await fetch(`${API_BASE_URL}/gastos-fixos`, {
         headers: {
-          'Authorization': `Bearer ${JSON.parse(localStorage.getItem('usuario')).token}`
+          'Authorization': `Bearer ${usuarioAuth.token}`
         }
       });
       if (responseGastosFixos.ok) {
@@ -199,12 +202,15 @@ export default function App(){
   // Funções para gastos
   const salvarGasto = async (gasto) => {
     try {
+      const usuarioAuth = JSON.parse(localStorage.getItem('usuario'));
+      if (!usuarioAuth || !usuarioAuth.token) return;
+
       if (gastoEdicao) {
         const response = await fetch(`${API_BASE_URL}/gastos/${gasto.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${JSON.parse(localStorage.getItem('usuario')).token}`
+            'Authorization': `Bearer ${usuarioAuth.token}`
           },
           body: JSON.stringify(gasto),
         })
@@ -218,7 +224,7 @@ export default function App(){
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${JSON.parse(localStorage.getItem('usuario')).token}`
+            'Authorization': `Bearer ${usuarioAuth.token}`
           },
           body: JSON.stringify(gasto),
         })
@@ -242,10 +248,13 @@ export default function App(){
   const excluirGasto = async (id) => {
     if (confirm('Deseja realmente excluir este gasto?')) {
       try {
+        const usuarioAuth = JSON.parse(localStorage.getItem('usuario'));
+        if (!usuarioAuth || !usuarioAuth.token) return;
+
         const response = await fetch(`${API_BASE_URL}/gastos/${id}`, {
           method: 'DELETE',
           headers: {
-            'Authorization': `Bearer ${JSON.parse(localStorage.getItem('usuario')).token}`
+            'Authorization': `Bearer ${usuarioAuth.token}`
           }
         })
         if (response.ok) {
@@ -264,12 +273,15 @@ export default function App(){
   // Funções para gastos fixos
   const salvarGastoFixo = async (gastoFixo) => {
     try {
+      const usuarioAuth = JSON.parse(localStorage.getItem('usuario'));
+      if (!usuarioAuth || !usuarioAuth.token) return;
+
       if (gastoFixoEdicao) {
         const response = await fetch(`${API_BASE_URL}/gastos-fixos/${gastoFixo.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${JSON.parse(localStorage.getItem('usuario')).token}`
+            'Authorization': `Bearer ${usuarioAuth.token}`
           },
           body: JSON.stringify(gastoFixo),
         })
@@ -283,7 +295,7 @@ export default function App(){
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${JSON.parse(localStorage.getItem('usuario')).token}`
+            'Authorization': `Bearer ${usuarioAuth.token}`
           },
           body: JSON.stringify(gastoFixo),
         })
@@ -304,10 +316,13 @@ export default function App(){
   const excluirGastoFixo = async (id) => {
     if (confirm('Deseja realmente excluir este gasto fixo?')) {
       try {
+        const usuarioAuth = JSON.parse(localStorage.getItem('usuario'));
+        if (!usuarioAuth || !usuarioAuth.token) return;
+
         const response = await fetch(`${API_BASE_URL}/gastos-fixos/${id}`, {
           method: 'DELETE',
           headers: {
-            'Authorization': `Bearer ${JSON.parse(localStorage.getItem('usuario')).token}`
+            'Authorization': `Bearer ${usuarioAuth.token}`
           }
         })
         if (response.ok) {

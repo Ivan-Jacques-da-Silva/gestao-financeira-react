@@ -2,8 +2,11 @@
 import express from 'express'
 import prisma from '../prisma/client.js'
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 
 const router = express.Router()
+
+const JWT_SECRET = process.env.JWT_SECRET || 'sua_chave_secreta_muito_segura'
 
 // Registrar usuário
 router.post('/registro', async (req, res) => {
@@ -51,9 +54,21 @@ router.post('/registro', async (req, res) => {
       }
     })
 
+    // Gerar token JWT
+    const token = jwt.sign(
+      { 
+        id: novoUsuario.id, 
+        usuario: novoUsuario.usuario, 
+        email: novoUsuario.email 
+      }, 
+      JWT_SECRET, 
+      { expiresIn: '7d' }
+    )
+
     res.status(201).json({
       mensagem: 'Usuário registrado com sucesso',
-      usuario: novoUsuario
+      usuario: novoUsuario,
+      token
     })
 
   } catch (error) {
@@ -94,12 +109,24 @@ router.post('/login', async (req, res) => {
       })
     }
 
-    // Retornar dados do usuário (sem a senha)
+    // Gerar token JWT
+    const token = jwt.sign(
+      { 
+        id: usuario.id, 
+        usuario: usuario.usuario, 
+        email: usuario.email 
+      }, 
+      JWT_SECRET, 
+      { expiresIn: '7d' }
+    )
+
+    // Retornar dados do usuário (sem a senha) e token
     const { senha: _, ...dadosUsuario } = usuario
 
     res.json({
       mensagem: 'Login realizado com sucesso',
-      usuario: dadosUsuario
+      usuario: dadosUsuario,
+      token
     })
 
   } catch (error) {

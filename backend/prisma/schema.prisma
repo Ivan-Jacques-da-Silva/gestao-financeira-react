@@ -9,15 +9,17 @@ datasource db {
 }
 
 model Usuario {
-  id        Int      @id @default(autoincrement())
-  usuario   String   @unique
-  email     String   @unique
+  id        Int         @id @default(autoincrement())
+  usuario   String      @unique
+  email     String      @unique
   senha     String
-  cpf       String   @unique
+  cpf       String      @unique
   telefone  String
   sexo      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  gastos    Gasto[]
+  gastosFixos GastoFixo[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 
   @@map("usuarios")
 }
@@ -31,6 +33,8 @@ model Gasto {
   parcelas  Int      @default(1)
   categoria String?
   status    String   @default("a_vencer")
+  usuarioId Int
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -46,6 +50,8 @@ model GastoFixo {
   categoria      String?
   ativo          Boolean  @default(true)
   status         String   @default("a_vencer")
+  usuarioId      Int
+  usuario        Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
