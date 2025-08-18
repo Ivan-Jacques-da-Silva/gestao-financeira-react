@@ -105,6 +105,19 @@ body {
   border-radius: 14px;
   box-shadow: var(--sombra);
   padding: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Cards KPI com altura uniforme */
+.card-kpi {
+  min-height: 140px;
+  height: 140px !important;
+  max-height: 140px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
 }
 
 .card h4 {
@@ -130,12 +143,20 @@ body {
 }
 
 .area-graficos {
-  min-height: 340px;
+  min-height: 280px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px dashed #e8eef2;
+  background: #fafbfc;
+  border: 1px solid #e5e7eb;
   border-radius: 12px;
+  overflow: hidden;
+}
+
+.area-graficos canvas {
+  max-width: 100%;
+  height: auto;
+  display: block;
 }
 
 .kpi {
@@ -180,10 +201,40 @@ body {
   transition: border-color 0.2s;
 }
 
-/* Estilos para tabelas */
+/* Estilos para tabelas responsivas */
 .tabela-container {
-  overflow-x: auto;
   margin-top: 16px;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid var(--cor-borda);
+  background: white;
+}
+
+/* Layout responsivo para tabelas - Cards no mobile */
+@media (max-width: 768px) {
+  .tabela-container {
+    overflow: visible;
+  }
+  
+  .tabela {
+    display: none; /* Ocultar tabela no mobile */
+  }
+  
+  .tabela-cards {
+    display: block;
+  }
+}
+
+@media (min-width: 769px) {
+  .tabela-container {
+    overflow-x: auto;
+  }
+  
+  .tabela-cards {
+    display: none; /* Ocultar cards no desktop */
+  }
 }
 
 .tabela {
@@ -366,51 +417,63 @@ body {
   gap: 8px;
 }
 
-/* Estilos para filtros e paginação */
+/* Estilos para filtros responsivos */
 .filtros-container {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 20px;
+  flex-direction: column;
+  gap: 16px;
   margin-bottom: 20px;
   padding: 16px;
   background: #f8f9fa;
-  border-radius: 8px;
+  border-radius: 12px;
   border: 1px solid #e5e7eb;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .filtros-data {
-  display: flex;
-  gap: 16px;
-  align-items: flex-end;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  align-items: end;
+  width: 100%;
 }
 
 .controles-paginacao {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 .campo-filtro {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
 }
 
 .campo-filtro label {
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .input-filtro,
 .select-itens {
-  padding: 8px 12px;
+  padding: 10px 14px;
   border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 14px;
   background: white;
-  min-width: 140px;
+  width: 100%;
+  min-width: 0;
+  transition: all 0.2s ease;
 }
 
 .input-filtro:focus,
@@ -499,20 +562,177 @@ body {
   border-radius: 6px;
 }
 
-/* Responsividade para filtros */
+/* Cards responsivos para dados da tabela */
+.tabela-cards {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+}
+
+.card-item {
+  background: white;
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: all 0.2s ease;
+}
+
+.card-item:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  transform: translateY(-1px);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.card-titulo {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--cor-texto);
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+}
+
+.card-valor {
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--cor-primaria);
+  margin: 0;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.card-detalhes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.card-detalhe {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.card-detalhe-label {
+  font-size: 12px;
+  color: var(--cor-subtexto);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-detalhe-valor {
+  font-size: 14px;
+  color: var(--cor-texto);
+  word-break: break-word;
+}
+
+.card-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+}
+
+/* Melhorar badges nos cards */
+.card-detalhe .badge-tipo,
+.card-detalhe .badge-status {
+  font-size: 10px;
+  padding: 3px 6px;
+  border-radius: 8px;
+  display: inline-block;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Responsividade melhorada */
 @media (max-width: 768px) {
   .filtros-container {
-    flex-direction: column;
-    align-items: stretch;
+    padding: 12px;
   }
   
   .filtros-data {
-    flex-wrap: wrap;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  
+  .controles-paginacao {
+    justify-content: center;
+    gap: 8px;
+  }
+  
+  .campo-filtro {
+    min-width: 0;
+  }
+  
+  .input-filtro,
+  .select-itens {
+    padding: 12px 14px;
+    font-size: 16px; /* Evita zoom no iOS */
+  }
+  
+  .btn-limpar-filtros {
+    padding: 12px 16px;
+    font-size: 14px;
+    width: 100%;
+    margin-top: 8px;
   }
   
   .numeros-pagina {
     flex-wrap: wrap;
     justify-content: center;
+    gap: 4px;
+  }
+  
+  .btn-numero-pagina {
+    min-width: 36px;
+    padding: 8px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .filtros-data {
+    grid-template-columns: 1fr;
+  }
+  
+  .card-detalhes {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .card-valor {
+    text-align: left;
+  }
+  
+  .formulario-header {
+    padding: 14px 16px;
+    flex-wrap: wrap;
+  }
+  
+  .formulario-header h4 {
+    font-size: 15px;
   }
 }
 
@@ -563,8 +783,9 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  max-height: 500px;
-  overflow-y: auto;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .lista-vazia {
@@ -582,6 +803,8 @@ body {
   border-radius: 10px;
   background: white;
   transition: all 0.2s;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .item-lista:hover {
@@ -664,9 +887,167 @@ body {
   color: #ef4444;
 }
 
+/* Menu Mobile Fixo */
+.menu-mobile {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top: 1px solid var(--cor-borda);
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+  z-index: 1000;
+  padding: 8px 0;
+}
+
+.menu-mobile-items {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.menu-mobile-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  color: var(--cor-subtexto);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.2s;
+  flex: 1;
+  max-width: 80px;
+}
+
+.menu-mobile-item.ativo {
+  color: var(--cor-primaria);
+  background: rgba(22, 160, 133, 0.1);
+}
+
+.menu-mobile-item i {
+  font-size: 20px;
+  margin-bottom: 2px;
+}
+
+.menu-mobile-item span {
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Estilos para dropdown de formulário responsivo */
+.formulario-dropdown {
+  border: 1px solid var(--cor-borda);
+  border-radius: 14px;
+  background: var(--cor-card);
+  box-shadow: var(--sombra);
+  overflow: hidden;
+  margin-bottom: 18px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.formulario-header {
+  padding: 16px 18px;
+  background: linear-gradient(135deg, var(--cor-primaria), var(--cor-primaria-escura));
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+  transition: all 0.3s ease;
+  min-height: 56px;
+}
+
+.formulario-header:hover {
+  background: linear-gradient(135deg, var(--cor-primaria-escura), var(--cor-primaria));
+}
+
+.formulario-header h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  flex: 1;
+  word-break: break-word;
+  line-height: 1.3;
+}
+
+.dropdown-icon {
+  font-size: 14px;
+  transition: transform 0.3s ease;
+  margin-left: 12px;
+  flex-shrink: 0;
+}
+
+.dropdown-icon.aberto {
+  transform: rotate(180deg);
+}
+
+.formulario-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.formulario-content.aberto {
+  max-height: 1000px;
+  overflow: visible;
+}
+
+.formulario-content .formulario {
+  padding: 18px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 @media (max-width: 960px) {
   .grid {
     grid-template-columns: 1fr;
+  }
+
+  /* Dashboard mobile - KPIs em 2 colunas, gráficos em coluna única */
+  .grid-dashboard-mobile {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 14px;
+    width: 100%;
+  }
+
+  .grid-dashboard-mobile .card {
+    grid-column: span 2; /* Gráficos ocupam as 2 colunas */
+  }
+
+  .grid-dashboard-mobile .card-kpi {
+    grid-column: span 1; /* KPIs ocupam 1 coluna cada */
+    min-height: 120px; /* Altura mínima uniforme */
+  }
+
+  /* Formulários mobile - formulário acima, lista abaixo */
+  .grid-mobile-form {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+    margin-top: 14px;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .form-container-mobile {
+    order: 1;
+  }
+
+  .list-container-mobile {
+    order: 2;
   }
 
   .item-lista {
@@ -677,5 +1058,134 @@ body {
   .item-acoes {
     margin-left: 0;
     align-self: flex-end;
+  }
+  
+  .container {
+    padding: 12px 16px 80px; /* Espaço extra para o menu mobile */
+  }
+  
+  .titulo {
+    font-size: 24px;
+  }
+  
+  .topbar {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+  
+  .btn-mostrar {
+    margin-left: 0;
+    justify-content: center;
+  }
+
+  /* Ocultar tabs desktop no mobile */
+  .tabs {
+    display: none;
+  }
+
+  /* Mostrar menu mobile */
+  .menu-mobile {
+    display: block;
+  }
+
+  /* Melhorar espaçamento dos campos no mobile */
+  .campo {
+    margin-bottom: 16px;
+  }
+
+  .campo input,
+  .campo select {
+    padding: 14px 16px;
+    font-size: 16px; /* Evita zoom no iOS */
+    border-radius: 12px;
+  }
+
+  .btn-salvar,
+  .btn-cancelar {
+    padding: 14px 20px;
+    font-size: 16px;
+    border-radius: 12px;
+  }
+
+  .card {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  /* Ajustar KPI cards para mobile */
+  .card-kpi {
+    min-height: 140px !important;
+    height: 140px !important;
+    max-height: 140px !important;
+  }
+  
+  .kpi {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+
+  .valor {
+    font-size: 20px;
+  }
+}
+
+/* Mostrar layout desktop apenas em telas grandes */
+@media (min-width: 961px) {
+  .grid[style*="display: none"] {
+    display: grid !important;
+  }
+  
+  .grid-dashboard-mobile,
+  .grid-mobile-form {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .area-graficos {
+    min-height: 240px;
+    padding: 8px;
+  }
+  
+  .card {
+    padding: 14px;
+  }
+  
+  .card-kpi {
+    min-height: 130px !important;
+    height: 130px !important;
+    max-height: 130px !important;
+  }
+  
+  .card h4 {
+    font-size: 14px;
+  }
+  
+  .valor {
+    font-size: 18px;
+  }
+  
+  .tabs {
+    flex-direction: column;
+  }
+  
+  .tab {
+    padding: 10px 12px;
+  }
+
+  /* Melhorar ainda mais o espaçamento no mobile pequeno */
+  .campo {
+    margin-bottom: 18px;
+  }
+
+  .formulario-header {
+    padding: 18px;
+    font-size: 18px;
+  }
+
+  .formulario-content .formulario {
+    padding: 20px;
   }
 }

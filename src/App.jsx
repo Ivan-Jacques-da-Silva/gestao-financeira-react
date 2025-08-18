@@ -3,8 +3,10 @@ import CardKPI from './componentes/CardKPI.jsx'
 import GraficoPizza from './componentes/GraficoPizza.jsx'
 import GraficoLinha from './componentes/GraficoLinha.jsx'
 import FormularioGasto from './componentes/FormularioGasto.jsx'
+import FormularioGastoDropdown from './componentes/FormularioGastoDropdown.jsx'
 import ListaGastos from './componentes/ListaGastos.jsx'
 import FormularioGastoFixo from './componentes/FormularioGastoFixo.jsx'
+import FormularioGastoFixoDropdown from './componentes/FormularioGastoFixoDropdown.jsx'
 import ListaGastosFixos from './componentes/ListaGastosFixos.jsx'
 import { IconeCartao, IconeGrafico, IconeSeta, IconeAlerta, IconeOlho } from './componentes/Icones.jsx'
 
@@ -320,9 +322,37 @@ export default function App(){
         </button>
       </div>
 
+      {/* Menu Mobile Fixo */}
+      <div className="menu-mobile">
+        <div className="menu-mobile-items">
+          <div 
+            className={['menu-mobile-item', aba==='dashboard'?'ativo':''].join(' ')} 
+            onClick={()=>setAba('dashboard')}
+          >
+            <i className="fas fa-tachometer-alt"></i>
+            <span>Dashboard</span>
+          </div>
+          <div 
+            className={['menu-mobile-item', aba==='gastos'?'ativo':''].join(' ')} 
+            onClick={()=>setAba('gastos')}
+          >
+            <i className="fas fa-credit-card"></i>
+            <span>Gastos e Parcelas</span>
+          </div>
+          <div 
+            className={['menu-mobile-item', aba==='fixos'?'ativo':''].join(' ')} 
+            onClick={()=>setAba('fixos')}
+          >
+            <i className="fas fa-calendar-alt"></i>
+            <span>Gastos Fixos</span>
+          </div>
+        </div>
+      </div>
+
       {aba==='dashboard' && (
         <>
-          <div className="grid" style={{gridTemplateColumns:'repeat(12,1fr)'}}>
+          {/* Desktop Layout */}
+          <div className="grid" style={{gridTemplateColumns:'repeat(12,1fr)', display: 'none'}}>
             <div style={{gridColumn:'span 3'}}>
               <CardKPI
                 titulo="Cartão de Crédito"
@@ -361,12 +391,69 @@ export default function App(){
             </div>
           </div>
 
-          <div className="grid" style={{gridTemplateColumns:'repeat(12,1fr)'}}>
+          {/* Mobile Layout - Cards em coluna */}
+          <div className="grid-dashboard-mobile">
+            <div className="card-kpi">
+              <CardKPI
+                titulo="Cartão de Crédito"
+                valorVisivel={`R$ ${kpis.totalCartaoMesAtual.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`}
+                esconder={!mostrar}
+                subtitulo="Total no mês atual"
+                icone={<IconeCartao />}
+              />
+            </div>
+            <div className="card-kpi">
+              <CardKPI
+                titulo="Gastos Fixos"
+                valorVisivel={`R$ ${kpis.totalGastosFixos.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`}
+                esconder={!mostrar}
+                subtitulo="Total mensal"
+                icone={<IconeGrafico />}
+              />
+            </div>
+            <div className="card-kpi">
+              <CardKPI
+                titulo="Média Mensal"
+                valorVisivel={`R$ ${kpis.mediaMensal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`}
+                esconder={!mostrar}
+                subtitulo="Últimos 3 meses"
+                icone={<IconeSeta />}
+              />
+            </div>
+            <div className="card-kpi">
+              <CardKPI
+                titulo="Pagamentos Atrasados"
+                valorVisivel={<><span>R$ {kpis.totalVencidos.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span><div className='sub'>{kpis.quantidadeVencidos} item(s) atrasado(s)</div></>}
+                esconder={!mostrar}
+                subtitulo=""
+                icone={<IconeAlerta />}
+              />
+            </div>
+            
+            <div className="card">
+              <h4>Distribuição por Tipo de Gasto</h4>
+              <div className="sub">Proporção de gastos por método de pagamento</div>
+              <div className="area-graficos">
+                <GraficoPizza dados={dadosPizza} esconder={!mostrar} />
+              </div>
+            </div>
+
+            <div className="card">
+              <h4>Evolução de Gastos</h4>
+              <div className="sub">Total de gastos nos últimos 6 meses</div>
+              <div className="area-graficos">
+                <GraficoLinha series={dadosLinha} esconder={!mostrar} />
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop Layout - Gráficos lado a lado */}
+          <div className="grid" style={{gridTemplateColumns:'repeat(12,1fr)', display: 'none'}}>
             <div style={{gridColumn:'span 6'}} className="card">
               <h4>Distribuição por Tipo de Gasto</h4>
               <div className="sub">Proporção de gastos por método de pagamento</div>
               <div className="area-graficos">
-                <GraficoPizza dados={dadosPizza} />
+                <GraficoPizza dados={dadosPizza} esconder={!mostrar} />
               </div>
             </div>
 
@@ -374,7 +461,7 @@ export default function App(){
               <h4>Evolução de Gastos</h4>
               <div className="sub">Total de gastos nos últimos 6 meses</div>
               <div className="area-graficos">
-                <GraficoLinha series={dadosLinha} />
+                <GraficoLinha series={dadosLinha} esconder={!mostrar} />
               </div>
             </div>
           </div>
@@ -382,41 +469,83 @@ export default function App(){
       )}
 
       {aba==='gastos' && (
-        <div className="grid" style={{gridTemplateColumns:'repeat(12,1fr)'}}>
-          <div style={{gridColumn:'span 5'}}>
-            <FormularioGasto
-              gasto={gastoEdicao}
-              onSalvar={salvarGasto}
-              onCancelar={cancelarEdicaoGasto}
-            />
+        <>
+          {/* Desktop Layout */}
+          <div className="grid" style={{gridTemplateColumns:'repeat(12,1fr)', display: 'none'}}>
+            <div style={{gridColumn:'span 5'}}>
+              <FormularioGasto
+                gasto={gastoEdicao}
+                onSalvar={salvarGasto}
+                onCancelar={cancelarEdicaoGasto}
+              />
+            </div>
+            <div style={{gridColumn:'span 7'}}>
+              <ListaGastos
+                gastos={gastos}
+                onEditar={editarGasto}
+                onExcluir={excluirGasto}
+              />
+            </div>
           </div>
-          <div style={{gridColumn:'span 7'}}>
-            <ListaGastos
-              gastos={gastos}
-              onEditar={editarGasto}
-              onExcluir={excluirGasto}
-            />
+
+          {/* Mobile Layout */}
+          <div className="grid-mobile-form">
+            <div className="form-container-mobile">
+              <FormularioGastoDropdown
+                gasto={gastoEdicao}
+                onSalvar={salvarGasto}
+                onCancelar={cancelarEdicaoGasto}
+              />
+            </div>
+            <div className="list-container-mobile">
+              <ListaGastos
+                gastos={gastos}
+                onEditar={editarGasto}
+                onExcluir={excluirGasto}
+              />
+            </div>
           </div>
-        </div>
+        </>
       )}
 
       {aba==='fixos' && (
-        <div className="grid" style={{gridTemplateColumns:'repeat(12,1fr)'}}>
-          <div style={{gridColumn:'span 5'}}>
-            <FormularioGastoFixo
-              gastoFixo={gastoFixoEdicao}
-              onSalvar={salvarGastoFixo}
-              onCancelar={cancelarEdicaoGastoFixo}
-            />
+        <>
+          {/* Desktop Layout */}
+          <div className="grid" style={{gridTemplateColumns:'repeat(12,1fr)', display: 'none'}}>
+            <div style={{gridColumn:'span 5'}}>
+              <FormularioGastoFixo
+                gastoFixo={gastoFixoEdicao}
+                onSalvar={salvarGastoFixo}
+                onCancelar={cancelarEdicaoGastoFixo}
+              />
+            </div>
+            <div style={{gridColumn:'span 7'}}>
+              <ListaGastosFixos
+                gastosFixos={gastosFixos}
+                onEditar={editarGastoFixo}
+                onExcluir={excluirGastoFixo}
+              />
+            </div>
           </div>
-          <div style={{gridColumn:'span 7'}}>
-            <ListaGastosFixos
-              gastosFixos={gastosFixos}
-              onEditar={editarGastoFixo}
-              onExcluir={excluirGastoFixo}
-            />
+
+          {/* Mobile Layout */}
+          <div className="grid-mobile-form">
+            <div className="form-container-mobile">
+              <FormularioGastoFixoDropdown
+                gastoFixo={gastoFixoEdicao}
+                onSalvar={salvarGastoFixo}
+                onCancelar={cancelarEdicaoGastoFixo}
+              />
+            </div>
+            <div className="list-container-mobile">
+              <ListaGastosFixos
+                gastosFixos={gastosFixos}
+                onEditar={editarGastoFixo}
+                onExcluir={excluirGastoFixo}
+              />
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   )

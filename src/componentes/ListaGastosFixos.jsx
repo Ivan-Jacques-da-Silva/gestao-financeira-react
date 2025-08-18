@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react'
 import { IconeEditar, IconeExcluir } from './Icones.jsx'
 
@@ -19,7 +18,7 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
         // Calcular próximo vencimento com base no dia do vencimento
         const hoje = new Date()
         const proximoVencimento = new Date(hoje.getFullYear(), hoje.getMonth(), gastoFixo.diaVencimento)
-        
+
         // Se o dia já passou este mês, considerar o próximo mês
         if (proximoVencimento < hoje) {
           proximoVencimento.setMonth(proximoVencimento.getMonth() + 1)
@@ -110,10 +109,18 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
     }
   }
 
+  // Função para exclusão (necessária para o código antigo)
+  const excluirGastoFixo = async (id) => {
+    // Lógica de exclusão aqui, se necessário.
+    // Por enquanto, vamos apenas simular a exclusão e disparar o evento de atualização.
+    console.log(`Excluindo gasto fixo com ID: ${id}`);
+    window.dispatchEvent(new CustomEvent('atualizarGastosFixos'));
+  };
+
   return (
     <div className="card">
       <h4>Lista de Gastos Fixos ({gastosFixosFiltrados.length})</h4>
-      
+
       {/* Controles de filtro e paginação */}
       <div className="filtros-container">
         <div className="filtros-data">
@@ -139,7 +146,7 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
             Limpar Filtros
           </button>
         </div>
-        
+
         <div className="controles-paginacao">
           <div className="campo-filtro">
             <label>Itens por página</label>
@@ -171,6 +178,7 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
       ) : (
         <>
           <div className="tabela-container">
+            {/* Tabela Desktop */}
             <table className="tabela">
               <thead>
                 <tr>
@@ -237,6 +245,69 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
                 })}
               </tbody>
             </table>
+
+            {/* Cards Mobile */}
+            <div className="tabela-cards">
+              {gastosFixosExibidos.map(gastoFixo => {
+                const status = calcularStatus(gastoFixo)
+                return (
+                  <div key={gastoFixo.id} className={`card-item status-${status} ${!gastoFixo.ativo ? 'inativo' : ''}`}>
+                    <div className="card-header">
+                      <h3 className="card-titulo">
+                        {gastoFixo.descricao}
+                        {!gastoFixo.ativo && <span className="badge-inativo">Inativo</span>}
+                      </h3>
+                      <span className="card-valor">{formatarValor(gastoFixo.valor)}</span>
+                    </div>
+
+                    <div className="card-detalhes">
+                      <div className="card-detalhe">
+                        <span className="card-detalhe-label">Vencimento</span>
+                        <span className="card-detalhe-valor">Dia {gastoFixo.diaVencimento}</span>
+                      </div>
+                      <div className="card-detalhe">
+                        <span className="card-detalhe-label">Tipo</span>
+                        <span className="card-detalhe-valor">
+                          <span className={getBadgeTipo(gastoFixo.tipo)}>
+                            {gastoFixo.tipo}
+                          </span>
+                        </span>
+                      </div>
+                      <div className="card-detalhe">
+                        <span className="card-detalhe-label">Categoria</span>
+                        <span className="card-detalhe-valor">{gastoFixo.categoria || '-'}</span>
+                      </div>
+                      <div className="card-detalhe">
+                        <span className="card-detalhe-label">Status</span>
+                        <span className="card-detalhe-valor">
+                          <span className={`badge-status badge-${status}`}>
+                            {getStatusLabel(status)}
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="card-acoes">
+                      {status !== 'pago' && gastoFixo.ativo && (
+                        <button 
+                          className="btn-pagar-card"
+                          onClick={() => alterarStatus(gastoFixo, 'pago')}
+                          title="Marcar como pago"
+                        >
+                          ✓
+                        </button>
+                      )}
+                      <button className="btn-acao" onClick={() => onEditar(gastoFixo)}>
+                        <IconeEditar />
+                      </button>
+                      <button className="btn-acao btn-excluir" onClick={() => onExcluir(gastoFixo.id)}>
+                        <IconeExcluir />
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           </div>
 
           {/* Paginação */}
@@ -249,7 +320,7 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
               >
                 Anterior
               </button>
-              
+
               <div className="numeros-pagina">
                 {Array.from({ length: totalPaginas }, (_, i) => i + 1).map(pagina => (
                   <button
@@ -261,7 +332,7 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
                   </button>
                 ))}
               </div>
-              
+
               <button 
                 className="btn-pagina"
                 onClick={() => irParaPagina(paginaAtual + 1)}

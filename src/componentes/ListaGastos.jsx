@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react'
 import { IconeEditar, IconeExcluir } from './Icones.jsx'
 
@@ -109,7 +108,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir }) {
   return (
     <div className="card">
       <h4>Lista de Gastos ({gastosFiltrados.length})</h4>
-      
+
       {/* Controles de filtro e paginação */}
       <div className="filtros-container">
         <div className="filtros-data">
@@ -135,7 +134,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir }) {
             Limpar Filtros
           </button>
         </div>
-        
+
         <div className="controles-paginacao">
           <div className="campo-filtro">
             <label>Itens por página</label>
@@ -167,6 +166,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir }) {
       ) : (
         <>
           <div className="tabela-container">
+            {/* Tabela Desktop */}
             <table className="tabela">
               <thead>
                 <tr>
@@ -226,6 +226,84 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir }) {
                 })}
               </tbody>
             </table>
+
+            {/* Cards Mobile */}
+            <div className="tabela-cards">
+              {gastosExibidos.map(gasto => {
+                const status = calcularStatus(gasto)
+                return (
+                  <div key={gasto.id} className={`card-item status-${status}`}>
+                    <div className="card-header">
+                      <h3 className="card-titulo">
+                        {gasto.descricao}
+                      </h3>
+                      <span className="card-valor">{formatarValor(gasto.valor)}</span>
+                    </div>
+
+                    <div className="card-detalhes">
+                      <div className="card-detalhe">
+                        <span className="card-detalhe-label">Tipo</span>
+                        <span className="card-detalhe-valor">
+                          <span className={getBadgeTipo(gasto.tipo)}>
+                            {gasto.tipo}
+                          </span>
+                        </span>
+                      </div>
+                      <div className="card-detalhe">
+                        <span className="card-detalhe-label">Data</span>
+                        <span className="card-detalhe-valor">
+                          {formatarData(gasto.data)}
+                        </span>
+                      </div>
+                      <div className="card-detalhe">
+                        <span className="card-detalhe-label">Status</span>
+                        <span className="card-detalhe-valor">
+                          <span className={`badge-status badge-${status}`}>
+                            {getStatusLabel(status)}
+                          </span>
+                        </span>
+                      </div>
+                      <div className="card-detalhe">
+                        <span className="card-detalhe-label">Parcelas</span>
+                        <span className="card-detalhe-valor">
+                          {gasto.parcelas > 1 ? `${gasto.parcelas}x` : '1x'}
+                        </span>
+                      </div>
+                      <div className="card-detalhe">
+                        <span className="card-detalhe-label">Categoria</span>
+                        <span className="card-detalhe-valor">
+                          {gasto.categoria || '-'}
+                        </span>
+                      </div>
+
+                      {status !== 'pago' && (
+                        <div className="card-detalhe">
+                          <span className="card-detalhe-label">Ação</span>
+                          <span className="card-detalhe-valor">
+                            <button 
+                              className="btn-pagar"
+                              onClick={() => alterarStatus(gasto, 'pago')}
+                              title="Marcar como pago"
+                            >
+                              Marcar como Pago
+                            </button>
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="card-acoes">
+                      <button className="btn-acao" onClick={() => onEditar(gasto)}>
+                        <IconeEditar />
+                      </button>
+                      <button className="btn-acao btn-excluir" onClick={() => onExcluir(gasto.id)}>
+                        <IconeExcluir />
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           </div>
 
           {/* Paginação */}
@@ -238,7 +316,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir }) {
               >
                 Anterior
               </button>
-              
+
               <div className="numeros-pagina">
                 {Array.from({ length: totalPaginas }, (_, i) => i + 1).map(pagina => (
                   <button
@@ -250,7 +328,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir }) {
                   </button>
                 ))}
               </div>
-              
+
               <button 
                 className="btn-pagina"
                 onClick={() => irParaPagina(paginaAtual + 1)}
