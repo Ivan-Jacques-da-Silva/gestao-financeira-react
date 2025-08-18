@@ -1353,6 +1353,90 @@ body {
   color: var(--cor-texto);
 }
 
+/* === BOTÃO DE MOSTRAR/OCULTAR SENHA === */
+.campo-senha {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input-senha-container {
+  position: relative;
+  width: 100%;
+}
+
+.input-senha {
+  padding: 14px 50px 14px 16px !important;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.botao-mostrar-senha {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cor-subtexto);
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  z-index: 2;
+}
+
+.botao-mostrar-senha:hover {
+  color: var(--cor-primaria);
+  background: rgba(22, 160, 133, 0.1);
+}
+
+.botao-mostrar-senha:focus {
+  outline: none;
+  color: var(--cor-primaria);
+  background: rgba(22, 160, 133, 0.1);
+}
+
+.icone-senha {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+}
+
+/* Ajustes responsivos para o botão de senha */
+@media (max-width: 640px) {
+  .input-senha {
+    padding: 12px 48px 12px 14px !important;
+  }
+  
+  .botao-mostrar-senha {
+    right: 10px;
+    padding: 6px;
+  }
+  
+  .icone-senha {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .input-senha {
+    padding: 12px 46px 12px 12px !important;
+  }
+  
+  .botao-mostrar-senha {
+    right: 8px;
+    padding: 5px;
+  }
+}
+
 /* === TELA DE AUTENTICAÇÃO === */
 .tela-auth {
   min-height: 100vh;

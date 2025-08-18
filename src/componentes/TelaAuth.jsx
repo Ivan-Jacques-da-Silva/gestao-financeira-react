@@ -1,9 +1,15 @@
 import React, { useState } from 'react'
+import { IconeOlhoAberto, IconeOlhoFechado } from './Icones'
 
 export default function TelaAuth({ onLogin }) {
   const [modo, setModo] = useState('login') // 'login' ou 'registro'
   const [carregando, setCarregando] = useState(false)
   const [erro, setErro] = useState('')
+  
+  // Estados para controlar visibilidade das senhas
+  const [mostrarSenha, setMostrarSenha] = useState(false)
+  const [mostrarSenhaRegistro, setMostrarSenhaRegistro] = useState(false)
+  const [mostrarConfirmarSenha, setMostrarConfirmarSenha] = useState(false)
 
   // Estados para login
   const [loginEmail, setLoginEmail] = useState('')
@@ -194,15 +200,26 @@ export default function TelaAuth({ onLogin }) {
               />
             </div>
 
-            <div className="form-grupo">
+            <div className="form-grupo campo-senha">
               <label>Senha</label>
-              <input
-                type="password"
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
-                placeholder="Digite sua senha"
-                required
-              />
+              <div className="input-senha-container">
+                <input
+                  type={mostrarSenha ? "text" : "password"}
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
+                  placeholder="Digite sua senha"
+                  className="input-senha"
+                  required
+                />
+                <button
+                  type="button"
+                  className="botao-mostrar-senha"
+                  onClick={() => setMostrarSenha(!mostrarSenha)}
+                  aria-label={mostrarSenha ? "Ocultar senha" : "Mostrar senha"}
+                >
+                  {mostrarSenha ? <IconeOlhoFechado /> : <IconeOlhoAberto />}
+                </button>
+              </div>
             </div>
 
             <button 
@@ -250,26 +267,48 @@ export default function TelaAuth({ onLogin }) {
             </div>
 
             <div className="form-row">
-              <div className="form-grupo">
+              <div className="form-grupo campo-senha">
                 <label>Senha</label>
-                <input
-                  type="password"
-                  value={dadosRegistro.senha}
-                  onChange={(e) => alterarDadosRegistro('senha', e.target.value)}
-                  placeholder="Digite uma senha"
-                  required
-                />
+                <div className="input-senha-container">
+                  <input
+                    type={mostrarSenhaRegistro ? "text" : "password"}
+                    value={dadosRegistro.senha}
+                    onChange={(e) => alterarDadosRegistro('senha', e.target.value)}
+                    placeholder="Digite uma senha"
+                    className="input-senha"
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="botao-mostrar-senha"
+                    onClick={() => setMostrarSenhaRegistro(!mostrarSenhaRegistro)}
+                    aria-label={mostrarSenhaRegistro ? "Ocultar senha" : "Mostrar senha"}
+                  >
+                    {mostrarSenhaRegistro ? <IconeOlhoFechado /> : <IconeOlhoAberto />}
+                  </button>
+                </div>
               </div>
 
-              <div className="form-grupo">
+              <div className="form-grupo campo-senha">
                 <label>Confirmar Senha</label>
-                <input
-                  type="password"
-                  value={dadosRegistro.confirmarSenha}
-                  onChange={(e) => alterarDadosRegistro('confirmarSenha', e.target.value)}
-                  placeholder="Confirme sua senha"
-                  required
-                />
+                <div className="input-senha-container">
+                  <input
+                    type={mostrarConfirmarSenha ? "text" : "password"}
+                    value={dadosRegistro.confirmarSenha}
+                    onChange={(e) => alterarDadosRegistro('confirmarSenha', e.target.value)}
+                    placeholder="Confirme sua senha"
+                    className="input-senha"
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="botao-mostrar-senha"
+                    onClick={() => setMostrarConfirmarSenha(!mostrarConfirmarSenha)}
+                    aria-label={mostrarConfirmarSenha ? "Ocultar senha" : "Mostrar senha"}
+                  >
+                    {mostrarConfirmarSenha ? <IconeOlhoFechado /> : <IconeOlhoAberto />}
+                  </button>
+                </div>
               </div>
             </div>
 
