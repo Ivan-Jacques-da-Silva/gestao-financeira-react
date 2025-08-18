@@ -14,6 +14,7 @@ export default function TelaAuth({ onLogin }) {
     usuario: '',
     email: '',
     senha: '',
+    confirmarSenha: '',
     cpf: '',
     telefone: '',
     sexo: ''
@@ -62,13 +63,30 @@ export default function TelaAuth({ onLogin }) {
     setCarregando(true)
     setErro('')
 
+    // Validar se as senhas coincidem
+    if (dadosRegistro.senha !== dadosRegistro.confirmarSenha) {
+      setErro('As senhas não coincidem')
+      setCarregando(false)
+      return
+    }
+
     try {
+      // Remover máscaras antes de enviar
+      const dadosEnvio = {
+        ...dadosRegistro,
+        cpf: removerMascara(dadosRegistro.cpf),
+        telefone: removerMascara(dadosRegistro.telefone)
+      }
+      
+      // Remover confirmação de senha antes de enviar
+      delete dadosEnvio.confirmarSenha
+
       const response = await fetch('/api/auth/registro', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(dadosRegistro)
+        body: JSON.stringify(dadosEnvio)
       })
 
       if (response.ok) {
@@ -92,10 +110,43 @@ export default function TelaAuth({ onLogin }) {
     }
   }
 
+  // Função para aplicar máscara de CPF
+  const aplicarMascaraCPF = (valor) => {
+    return valor
+      .replace(/\D/g, '')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+      .replace(/(-\d{2})\d+?$/, '$1')
+  }
+
+  // Função para aplicar máscara de telefone
+  const aplicarMascaraTelefone = (valor) => {
+    return valor
+      .replace(/\D/g, '')
+      .replace(/(\d{2})(\d)/, '($1) $2')
+      .replace(/(\d{4})(\d)/, '$1-$2')
+      .replace(/(\d{4})-(\d)(\d{4})/, '$1$2-$3')
+      .replace(/(-\d{4})\d+?$/, '$1')
+  }
+
+  // Função para remover máscara
+  const removerMascara = (valor) => {
+    return valor.replace(/\D/g, '')
+  }
+
   const alterarDadosRegistro = (campo, valor) => {
+    let valorProcessado = valor
+
+    if (campo === 'cpf') {
+      valorProcessado = aplicarMascaraCPF(valor)
+    } else if (campo === 'telefone') {
+      valorProcessado = aplicarMascaraTelefone(valor)
+    }
+
     setDadosRegistro(prev => ({
       ...prev,
-      [campo]: valor
+      [campo]: valorProcessado
     }))
   }
 
@@ -174,59 +225,76 @@ export default function TelaAuth({ onLogin }) {
           </form>
         ) : (
           <form onSubmit={handleRegistro} className="auth-form">
-            <div className="form-grupo">
-              <label>Nome de Usuário</label>
-              <input
-                type="text"
-                value={dadosRegistro.usuario}
-                onChange={(e) => alterarDadosRegistro('usuario', e.target.value)}
-                placeholder="Digite um nome de usuário"
-                required
-              />
+            <div className="form-row">
+              <div className="form-grupo">
+                <label>Nome de Usuário</label>
+                <input
+                  type="text"
+                  value={dadosRegistro.usuario}
+                  onChange={(e) => alterarDadosRegistro('usuario', e.target.value)}
+                  placeholder="Digite um nome de usuário"
+                  required
+                />
+              </div>
+
+              <div className="form-grupo">
+                <label>Email</label>
+                <input
+                  type="email"
+                  value={dadosRegistro.email}
+                  onChange={(e) => alterarDadosRegistro('email', e.target.value)}
+                  placeholder="Digite seu email"
+                  required
+                />
+              </div>
             </div>
 
-            <div className="form-grupo">
-              <label>Email</label>
-              <input
-                type="email"
-                value={dadosRegistro.email}
-                onChange={(e) => alterarDadosRegistro('email', e.target.value)}
-                placeholder="Digite seu email"
-                required
-              />
+            <div className="form-row">
+              <div className="form-grupo">
+                <label>Senha</label>
+                <input
+                  type="password"
+                  value={dadosRegistro.senha}
+                  onChange={(e) => alterarDadosRegistro('senha', e.target.value)}
+                  placeholder="Digite uma senha"
+                  required
+                />
+              </div>
+
+              <div className="form-grupo">
+                <label>Confirmar Senha</label>
+                <input
+                  type="password"
+                  value={dadosRegistro.confirmarSenha}
+                  onChange={(e) => alterarDadosRegistro('confirmarSenha', e.target.value)}
+                  placeholder="Confirme sua senha"
+                  required
+                />
+              </div>
             </div>
 
-            <div className="form-grupo">
-              <label>Senha</label>
-              <input
-                type="password"
-                value={dadosRegistro.senha}
-                onChange={(e) => alterarDadosRegistro('senha', e.target.value)}
-                placeholder="Digite uma senha"
-                required
-              />
-            </div>
+            <div className="form-row">
+              <div className="form-grupo">
+                <label>CPF</label>
+                <input
+                  type="text"
+                  value={dadosRegistro.cpf}
+                  onChange={(e) => alterarDadosRegistro('cpf', e.target.value)}
+                  placeholder="000.000.000-00"
+                  required
+                />
+              </div>
 
-            <div className="form-grupo">
-              <label>CPF</label>
-              <input
-                type="text"
-                value={dadosRegistro.cpf}
-                onChange={(e) => alterarDadosRegistro('cpf', e.target.value)}
-                placeholder="000.000.000-00"
-                required
-              />
-            </div>
-
-            <div className="form-grupo">
-              <label>Telefone</label>
-              <input
-                type="tel"
-                value={dadosRegistro.telefone}
-                onChange={(e) => alterarDadosRegistro('telefone', e.target.value)}
-                placeholder="(00) 00000-0000"
-                required
-              />
+              <div className="form-grupo">
+                <label>Telefone</label>
+                <input
+                  type="tel"
+                  value={dadosRegistro.telefone}
+                  onChange={(e) => alterarDadosRegistro('telefone', e.target.value)}
+                  placeholder="(00) 00000-0000"
+                  required
+                />
+              </div>
             </div>
 
             <div className="form-grupo">
@@ -239,7 +307,7 @@ export default function TelaAuth({ onLogin }) {
                 <option value="">Selecione</option>
                 <option value="masculino">Masculino</option>
                 <option value="feminino">Feminino</option>
-                <option value="outro">Outro</option>
+                <option value="outro">Prefiro não falar</option>
               </select>
             </div>
 

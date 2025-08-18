@@ -11,6 +11,7 @@ import FormularioGastoFixoDropdown from './componentes/FormularioGastoFixoDropdo
 import ListaGastosFixos from './componentes/ListaGastosFixos.jsx'
 import { IconeCartao, IconeGrafico, IconeSeta, IconeAlerta, IconeOlho } from './componentes/Icones.jsx'
 import TelaAuth from './componentes/TelaAuth'
+import Header from './componentes/Header'
 
 const API_BASE_URL = 'http://localhost:5000/api'
 
@@ -364,23 +365,9 @@ export default function App(){
 
   return (
     <div className="app">
-      {/* Header Desktop */}
-      <header className="header">
-        <div className="header-titulo">
-          <i className="fas fa-wallet"></i>
-          <h1>Gestão Financeira</h1>
-        </div>
-        <div className="header-usuario">
-          <span>Olá, {usuario.usuario}!</span>
-          <button onClick={handleLogout} className="botao-logout">
-            <i className="fas fa-sign-out-alt"></i>
-            Sair
-          </button>
-        </div>
-      </header>
+      <Header usuario={usuario} onLogout={handleLogout} />
 
       <div className="container">
-        <div className="titulo">Gestão Financeira Pessoal</div>
 
         <div className="topbar">
           <div className="tabs">

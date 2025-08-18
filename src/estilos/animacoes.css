@@ -1,0 +1,242 @@
+
+/* ===== ANIMAÇÕES BÁSICAS ===== */
+
+/* Animação de fade-in para entrada de telas */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animação de slide-in da esquerda */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Animação de slide-in da direita */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Animação de scale-in */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Animação de bounce-in suave */
+@keyframes bounceInSoft {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ===== APLICAÇÃO DAS ANIMAÇÕES ===== */
+
+/* Header */
+.header {
+  animation: slideInLeft 0.4s ease-out;
+}
+
+/* Container principal */
+.container {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Cards KPI */
+.card-kpi {
+  animation: bounceInSoft 0.4s ease-out;
+  animation-fill-mode: both;
+}
+
+.card-kpi:nth-child(1) { animation-delay: 0.1s; }
+.card-kpi:nth-child(2) { animation-delay: 0.2s; }
+.card-kpi:nth-child(3) { animation-delay: 0.3s; }
+.card-kpi:nth-child(4) { animation-delay: 0.4s; }
+
+/* Cards gerais */
+.card {
+  animation: scaleIn 0.4s ease-out;
+  animation-fill-mode: both;
+}
+
+/* Formulários dropdown */
+.formulario-dropdown {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+/* Listas */
+.lista {
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* Itens da lista com delay escalonado */
+.item-lista {
+  animation: slideInRight 0.3s ease-out;
+  animation-fill-mode: both;
+}
+
+.item-lista:nth-child(1) { animation-delay: 0.1s; }
+.item-lista:nth-child(2) { animation-delay: 0.15s; }
+.item-lista:nth-child(3) { animation-delay: 0.2s; }
+.item-lista:nth-child(4) { animation-delay: 0.25s; }
+.item-lista:nth-child(5) { animation-delay: 0.3s; }
+.item-lista:nth-child(n+6) { animation-delay: 0.35s; }
+
+/* Cards mobile da tabela */
+.card-item {
+  animation: slideInLeft 0.3s ease-out;
+  animation-fill-mode: both;
+}
+
+.card-item:nth-child(1) { animation-delay: 0.1s; }
+.card-item:nth-child(2) { animation-delay: 0.15s; }
+.card-item:nth-child(3) { animation-delay: 0.2s; }
+.card-item:nth-child(4) { animation-delay: 0.25s; }
+.card-item:nth-child(5) { animation-delay: 0.3s; }
+.card-item:nth-child(n+6) { animation-delay: 0.35s; }
+
+/* Tela de autenticação */
+.auth-container {
+  animation: scaleIn 0.5s ease-out;
+}
+
+/* Tabs */
+.tabs,
+.auth-tabs {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+/* Botões */
+.btn-salvar,
+.btn-cancelar,
+.auth-botao {
+  animation: bounceInSoft 0.3s ease-out;
+  animation-delay: 0.2s;
+  animation-fill-mode: both;
+}
+
+/* Menu mobile */
+.menu-mobile {
+  animation: slideInLeft 0.4s ease-out;
+}
+
+/* Filtros */
+.filtros-container {
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* Paginação */
+.paginacao {
+  animation: slideInRight 0.3s ease-out;
+  animation-delay: 0.2s;
+  animation-fill-mode: both;
+}
+
+/* Título principal */
+.titulo {
+  animation: slideInLeft 0.4s ease-out;
+}
+
+/* Topbar */
+.topbar {
+  animation: fadeIn 0.4s ease-out;
+  animation-delay: 0.1s;
+  animation-fill-mode: both;
+}
+
+/* Gráficos */
+.area-graficos {
+  animation: scaleIn 0.5s ease-out;
+  animation-delay: 0.3s;
+  animation-fill-mode: both;
+}
+
+/* Tabelas */
+.tabela-container {
+  animation: fadeIn 0.4s ease-out;
+  animation-delay: 0.2s;
+  animation-fill-mode: both;
+}
+
+/* Campos de formulário */
+.form-grupo,
+.campo {
+  animation: slideInLeft 0.3s ease-out;
+  animation-fill-mode: both;
+}
+
+.form-grupo:nth-child(1),
+.campo:nth-child(1) { animation-delay: 0.1s; }
+.form-grupo:nth-child(2),
+.campo:nth-child(2) { animation-delay: 0.15s; }
+.form-grupo:nth-child(3),
+.campo:nth-child(3) { animation-delay: 0.2s; }
+.form-grupo:nth-child(4),
+.campo:nth-child(4) { animation-delay: 0.25s; }
+.form-grupo:nth-child(5),
+.campo:nth-child(5) { animation-delay: 0.3s; }
+.form-grupo:nth-child(n+6),
+.campo:nth-child(n+6) { animation-delay: 0.35s; }
+
+/* Erro de autenticação */
+.auth-erro {
+  animation: bounceInSoft 0.4s ease-out;
+}
+
+/* ===== ANIMAÇÕES RESPONSIVAS ===== */
+
+/* Reduzir animações em telas muito pequenas para melhor performance */
+@media (max-width: 480px) {
+  .card-kpi,
+  .card,
+  .item-lista,
+  .card-item {
+    animation-duration: 0.2s;
+  }
+  
+  .card-kpi:nth-child(n+3),
+  .item-lista:nth-child(n+4),
+  .card-item:nth-child(n+4) {
+    animation-delay: 0.1s;
+  }
+}
+
+/* Desabilitar animações se o usuário preferir movimento reduzido */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
