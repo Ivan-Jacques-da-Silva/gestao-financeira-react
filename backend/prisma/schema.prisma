@@ -16,6 +16,7 @@ model Gasto {
   data      DateTime
   parcelas  Int      @default(1)
   categoria String?
+  status    String   @default("a_vencer")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -30,6 +31,7 @@ model GastoFixo {
   diaVencimento  Int
   categoria      String?
   ativo          Boolean  @default(true)
+  status         String   @default("a_vencer")
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 

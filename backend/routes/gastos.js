@@ -34,7 +34,7 @@ router.get('/:id', async (req, res) => {
 // POST - Criar novo gasto
 router.post('/', async (req, res) => {
   try {
-    const { descricao, valor, tipo, data, parcelas, categoria } = req.body
+    const { descricao, valor, tipo, data, parcelas, categoria, status } = req.body
     
     const gasto = await prisma.gasto.create({
       data: {
@@ -43,7 +43,8 @@ router.post('/', async (req, res) => {
         tipo,
         data: new Date(data),
         parcelas: parseInt(parcelas) || 1,
-        categoria
+        categoria,
+        status: status || 'a_vencer'
       }
     })
     
@@ -56,7 +57,7 @@ router.post('/', async (req, res) => {
 // PUT - Atualizar gasto
 router.put('/:id', async (req, res) => {
   try {
-    const { descricao, valor, tipo, data, parcelas, categoria } = req.body
+    const { descricao, valor, tipo, data, parcelas, categoria, status } = req.body
     
     const gasto = await prisma.gasto.update({
       where: { id: parseInt(req.params.id) },
@@ -66,7 +67,8 @@ router.put('/:id', async (req, res) => {
         tipo,
         data: new Date(data),
         parcelas: parseInt(parcelas) || 1,
-        categoria
+        categoria,
+        status: status || 'a_vencer'
       }
     })
     

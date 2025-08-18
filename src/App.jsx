@@ -26,6 +26,18 @@ export default function App(){
   useEffect(() => {
     carregarGastos()
     carregarGastosFixos()
+
+    // Listeners para atualizar as listas quando o status for alterado
+    const handleAtualizarGastos = () => carregarGastos()
+    const handleAtualizarGastosFixos = () => carregarGastosFixos()
+
+    window.addEventListener('atualizarGastos', handleAtualizarGastos)
+    window.addEventListener('atualizarGastosFixos', handleAtualizarGastosFixos)
+
+    return () => {
+      window.removeEventListener('atualizarGastos', handleAtualizarGastos)
+      window.removeEventListener('atualizarGastosFixos', handleAtualizarGastosFixos)
+    }
   }, [])
 
   // Funções para carregar dados da API
@@ -61,13 +73,119 @@ export default function App(){
     }
   }
 
-  const dadosPizza = [
-    { rotulo: 'Cartão de Crédito', valor: 1200 },
-    { rotulo: 'Pix', valor: 800 },
-    { rotulo: 'Boleto', valor: 420 },
-    { rotulo: 'Débito', valor: 300 }
-  ]
-  const dadosLinha = [300, 520, 410, 760, 640, 880]
+  // Calcular dados do gráfico de pizza por método de pagamento
+  const dadosPizza = React.useMemo(() => {
+    const todosDados = [...gastos, ...gastosFixos]
+    const agrupados = {}
+    
+    todosDados.forEach(item => {
+      const tipo = item.tipo || 'Outros'
+      if (!agrupados[tipo]) {
+        agrupados[tipo] = 0
+      }
+      agrupados[tipo] += Number(item.valor) || 0
+    })
+    
+    return Object.entries(agrupados).map(([rotulo, valor]) => ({
+      rotulo,
+      valor
+    }))
+  }, [gastos, gastosFixos])
+
+  // Calcular dados do gráfico de linha dos últimos 6 meses
+  const dadosLinha = React.useMemo(() => {
+    const hoje = new Date()
+    const meses = []
+    
+    // Gerar os últimos 6 meses
+    for (let i = 5; i >= 0; i--) {
+      const data = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1)
+      meses.push({
+        ano: data.getFullYear(),
+        mes: data.getMonth(),
+        valor: 0
+      })
+    }
+    
+    // Somar gastos por mês
+    const todosDados = [...gastos, ...gastosFixos]
+    todosDados.forEach(item => {
+      const dataItem = new Date(item.data || hoje)
+      const anoItem = dataItem.getFullYear()
+      const mesItem = dataItem.getMonth()
+      
+      const mesEncontrado = meses.find(m => m.ano === anoItem && m.mes === mesItem)
+      if (mesEncontrado) {
+        mesEncontrado.valor += Number(item.valor) || 0
+      }
+    })
+    
+    return meses.map(m => m.valor)
+  }, [gastos, gastosFixos])
+
+  // Calcular KPIs reais
+  const kpis = React.useMemo(() => {
+    const hoje = new Date()
+    const mesAtual = hoje.getMonth()
+    const anoAtual = hoje.getFullYear()
+    
+    // Total gastos no cartão de crédito no mês atual
+    const totalCartaoMesAtual = gastos
+      .filter(g => {
+        const dataGasto = new Date(g.data)
+        return g.tipo === 'Cartão de Crédito' && 
+               dataGasto.getMonth() === mesAtual && 
+               dataGasto.getFullYear() === anoAtual
+      })
+      .reduce((total, g) => total + Number(g.valor), 0)
+    
+    // Total gastos fixos mensais ativos
+    const totalGastosFixos = gastosFixos
+      .filter(gf => gf.ativo)
+      .reduce((total, gf) => total + Number(gf.valor), 0)
+    
+    // Média mensal dos últimos 3 meses
+    const ultimosTresMeses = []
+    for (let i = 2; i >= 0; i--) {
+      const data = new Date(anoAtual, mesAtual - i, 1)
+      ultimosTresMeses.push({
+        ano: data.getFullYear(),
+        mes: data.getMonth()
+      })
+    }
+    
+    const totalUltimosTresMeses = ultimosTresMeses.reduce((total, periodo) => {
+      const gastosDoMes = gastos
+        .filter(g => {
+          const dataGasto = new Date(g.data)
+          return dataGasto.getMonth() === periodo.mes && 
+                 dataGasto.getFullYear() === periodo.ano
+        })
+        .reduce((soma, g) => soma + Number(g.valor), 0)
+      
+      const gastosFixosDoMes = gastosFixos
+        .filter(gf => gf.ativo)
+        .reduce((soma, gf) => soma + Number(gf.valor), 0)
+      
+      return total + gastosDoMes + gastosFixosDoMes
+    }, 0)
+    
+    const mediaMensal = totalUltimosTresMeses / 3
+    
+    // Pagamentos atrasados (status vencido)
+    const gastosVencidos = gastos.filter(g => g.status === 'vencido')
+    const gastosFixosVencidos = gastosFixos.filter(gf => gf.status === 'vencido')
+    const totalVencidos = [...gastosVencidos, ...gastosFixosVencidos]
+      .reduce((total, item) => total + Number(item.valor), 0)
+    
+    return {
+      totalCartaoMesAtual,
+      totalGastosFixos,
+      mediaMensal,
+      totalVencidos,
+      quantidadeVencidos: gastosVencidos.length + gastosFixosVencidos.length
+    }
+  }, [gastos, gastosFixos])
 
   // Funções para gastos
   const salvarGasto = async (gasto) => {
@@ -208,7 +326,7 @@ export default function App(){
             <div style={{gridColumn:'span 3'}}>
               <CardKPI
                 titulo="Cartão de Crédito"
-                valorVisivel="R$ 2.720,00"
+                valorVisivel={`R$ ${kpis.totalCartaoMesAtual.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`}
                 esconder={!mostrar}
                 subtitulo="Total no mês atual"
                 icone={<IconeCartao />}
@@ -217,7 +335,7 @@ export default function App(){
             <div style={{gridColumn:'span 3'}}>
               <CardKPI
                 titulo="Gastos Fixos"
-                valorVisivel="R$ 1.560,00"
+                valorVisivel={`R$ ${kpis.totalGastosFixos.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`}
                 esconder={!mostrar}
                 subtitulo="Total mensal"
                 icone={<IconeGrafico />}
@@ -226,7 +344,7 @@ export default function App(){
             <div style={{gridColumn:'span 3'}}>
               <CardKPI
                 titulo="Média Mensal"
-                valorVisivel="R$ 2.140,00"
+                valorVisivel={`R$ ${kpis.mediaMensal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`}
                 esconder={!mostrar}
                 subtitulo="Últimos 3 meses"
                 icone={<IconeSeta />}
@@ -235,7 +353,7 @@ export default function App(){
             <div style={{gridColumn:'span 3'}}>
               <CardKPI
                 titulo="Pagamentos Atrasados"
-                valorVisivel={<><span>R$ 0,00</span><div className='sub'>0 item(s) atrasado(s)</div></>}
+                valorVisivel={<><span>R$ {kpis.totalVencidos.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span><div className='sub'>{kpis.quantidadeVencidos} item(s) atrasado(s)</div></>}
                 esconder={!mostrar}
                 subtitulo=""
                 icone={<IconeAlerta />}
