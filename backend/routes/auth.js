@@ -50,6 +50,7 @@ router.post('/registro', async (req, res) => {
         cpf: true,
         telefone: true,
         sexo: true,
+        mostrarValores: true,
         createdAt: true
       }
     })
@@ -134,6 +135,156 @@ router.post('/login', async (req, res) => {
     res.status(500).json({
       erro: 'Erro interno do servidor'
     })
+  }
+})
+
+// Verificar senha e alterar preferência de mostrar valores
+router.post('/verificar-senha', async (req, res) => {
+  try {
+    const { senha } = req.body
+    const token = req.headers.authorization?.replace('Bearer ', '')
+
+    if (!token) {
+      return res.status(401).json({ erro: 'Token não fornecido' })
+    }
+
+    // Decodificar token para obter ID do usuário
+    const decoded = jwt.verify(token, JWT_SECRET)
+    
+    // Buscar usuário
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: decoded.id }
+    })
+
+    if (!usuario) {
+      return res.status(404).json({ erro: 'Usuário não encontrado' })
+    }
+
+    // Verificar senha
+    const senhaValida = await bcrypt.compare(senha, usuario.senha)
+
+    if (!senhaValida) {
+      return res.status(401).json({ erro: 'Senha incorreta' })
+    }
+
+    // Alterar preferência (toggle)
+    const usuarioAtualizado = await prisma.usuario.update({
+      where: { id: usuario.id },
+      data: { mostrarValores: !usuario.mostrarValores },
+      select: {
+        id: true,
+        usuario: true,
+        email: true,
+        cpf: true,
+        telefone: true,
+        sexo: true,
+        mostrarValores: true,
+        createdAt: true
+      }
+    })
+
+    res.json({
+      mensagem: 'Preferência atualizada com sucesso',
+      mostrarValores: usuarioAtualizado.mostrarValores
+    })
+
+  } catch (error) {
+    console.error('Erro ao verificar senha:', error)
+    res.status(500).json({ erro: 'Erro interno do servidor' })
+  }
+})
+
+// Atualizar perfil do usuário
+router.put('/atualizar-perfil', async (req, res) => {
+  try {
+    const { usuario: nomeUsuario, email, telefone, cpf, senhaAtual, novaSenha } = req.body
+    const token = req.headers.authorization?.replace('Bearer ', '')
+
+    if (!token) {
+      return res.status(401).json({ erro: 'Token não fornecido' })
+    }
+
+    // Decodificar token para obter ID do usuário
+    const decoded = jwt.verify(token, JWT_SECRET)
+    
+    // Buscar usuário atual
+    const usuarioAtual = await prisma.usuario.findUnique({
+      where: { id: decoded.id }
+    })
+
+    if (!usuarioAtual) {
+      return res.status(404).json({ erro: 'Usuário não encontrado' })
+    }
+
+    // Verificar se email ou usuário já existem (exceto o próprio usuário)
+    const usuarioExistente = await prisma.usuario.findFirst({
+      where: {
+        OR: [
+          { usuario: nomeUsuario },
+          { email: email }
+        ],
+        NOT: {
+          id: decoded.id
+        }
+      }
+    })
+
+    if (usuarioExistente) {
+      if (usuarioExistente.usuario === nomeUsuario) {
+        return res.status(400).json({ erro: 'Nome de usuário já está em uso' })
+      }
+      if (usuarioExistente.email === email) {
+        return res.status(400).json({ erro: 'Email já está em uso' })
+      }
+    }
+
+    // Preparar dados para atualização
+    const dadosAtualizacao = {
+      usuario: nomeUsuario,
+      email,
+      telefone,
+      cpf
+    }
+
+    // Se uma nova senha foi fornecida, verificar a senha atual e atualizar
+    if (novaSenha) {
+      if (!senhaAtual) {
+        return res.status(400).json({ erro: 'Senha atual é obrigatória para alterar a senha' })
+      }
+
+      const senhaValida = await bcrypt.compare(senhaAtual, usuarioAtual.senha)
+      if (!senhaValida) {
+        return res.status(401).json({ erro: 'Senha atual incorreta' })
+      }
+
+      // Criptografar nova senha
+      dadosAtualizacao.senha = await bcrypt.hash(novaSenha, 10)
+    }
+
+    // Atualizar usuário
+    const usuarioAtualizado = await prisma.usuario.update({
+      where: { id: decoded.id },
+      data: dadosAtualizacao,
+      select: {
+        id: true,
+        usuario: true,
+        email: true,
+        cpf: true,
+        telefone: true,
+        sexo: true,
+        mostrarValores: true,
+        createdAt: true
+      }
+    })
+
+    res.json({
+      mensagem: 'Perfil atualizado com sucesso',
+      usuario: usuarioAtualizado
+    })
+
+  } catch (error) {
+    console.error('Erro ao atualizar perfil:', error)
+    res.status(500).json({ erro: 'Erro interno do servidor' })
   }
 })
 

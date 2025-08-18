@@ -12,13 +12,18 @@ import ListaGastosFixos from './componentes/ListaGastosFixos.jsx'
 import { IconeCartao, IconeGrafico, IconeSeta, IconeAlerta, IconeOlho } from './componentes/Icones.jsx'
 import TelaAuth from './componentes/TelaAuth'
 import Header from './componentes/Header'
+import ModalSenha from './componentes/ModalSenha.jsx'
+import ConfiguracaoUsuario from './componentes/ConfiguracaoUsuario.jsx'
 
 const API_BASE_URL = 'http://localhost:5000/api'
 
-export default function App(){
+export default function App() {
   const [aba, setAba] = useState('dashboard')
   const [usuario, setUsuario] = useState(null)
   const [mostrar, setMostrar] = useState(false)
+  const [modalSenhaAberto, setModalSenhaAberto] = useState(false)
+  const [carregandoModal, setCarregandoModal] = useState(false)
+  const [mostrarConfiguracoes, setMostrarConfiguracoes] = useState(false)
 
   // Estados para gastos e parcelas
   const [gastos, setGastos] = useState([])
@@ -44,6 +49,7 @@ export default function App(){
   useEffect(() => {
     if (usuario) {
       carregarDados()
+      setMostrar(usuario.mostrarValores || false)
     }
   }, [usuario])
 
@@ -147,8 +153,8 @@ export default function App(){
       .filter(g => {
         const dataGasto = new Date(g.data)
         return g.tipo === 'Cartão de Crédito' &&
-               dataGasto.getMonth() === mesAtual &&
-               dataGasto.getFullYear() === anoAtual
+          dataGasto.getMonth() === mesAtual &&
+          dataGasto.getFullYear() === anoAtual
       })
       .reduce((total, g) => total + Number(g.valor), 0)
 
@@ -172,7 +178,7 @@ export default function App(){
         .filter(g => {
           const dataGasto = new Date(g.data)
           return dataGasto.getMonth() === periodo.mes &&
-                 dataGasto.getFullYear() === periodo.ano
+            dataGasto.getFullYear() === periodo.ano
         })
         .reduce((soma, g) => soma + Number(g.valor), 0)
 
@@ -358,6 +364,81 @@ export default function App(){
     setGastosFixos([])
   }
 
+  const handleMostrarValores = () => {
+    setModalSenhaAberto(true)
+  }
+
+  const handleConfirmarSenha = async (senha) => {
+    setCarregandoModal(true)
+    try {
+      const usuarioAuth = JSON.parse(localStorage.getItem('usuario'));
+      if (!usuarioAuth || !usuarioAuth.token) return;
+
+      const response = await fetch(`${API_BASE_URL}/auth/verificar-senha`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${usuarioAuth.token}`
+        },
+        body: JSON.stringify({ senha }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setMostrar(data.mostrarValores)
+        
+        // Atualizar usuário no localStorage
+        const usuarioAtualizado = { ...usuarioAuth, mostrarValores: data.mostrarValores }
+        localStorage.setItem('usuario', JSON.stringify(usuarioAtualizado))
+        setUsuario(usuarioAtualizado)
+        
+        setModalSenhaAberto(false)
+      } else {
+        const errorData = await response.json()
+        alert(errorData.erro || 'Senha incorreta')
+      }
+    } catch (error) {
+      console.error('Erro ao verificar senha:', error)
+      alert('Erro ao verificar senha')
+    } finally {
+      setCarregandoModal(false)
+    }
+  }
+
+  const handleSalvarConfiguracoes = async (dadosUsuario) => {
+    try {
+      const usuarioAuth = JSON.parse(localStorage.getItem('usuario'));
+      if (!usuarioAuth || !usuarioAuth.token) return;
+
+      const response = await fetch(`${API_BASE_URL}/auth/atualizar-perfil`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${usuarioAuth.token}`
+        },
+        body: JSON.stringify(dadosUsuario),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        
+        // Atualizar usuário no localStorage
+        const usuarioAtualizado = { ...usuarioAuth, ...data.usuario }
+        localStorage.setItem('usuario', JSON.stringify(usuarioAtualizado))
+        setUsuario(usuarioAtualizado)
+        
+        setMostrarConfiguracoes(false)
+        alert('Configurações salvas com sucesso!')
+      } else {
+        const errorData = await response.json()
+        throw new Error(errorData.erro || 'Erro ao salvar configurações')
+      }
+    } catch (error) {
+      console.error('Erro ao salvar configurações:', error)
+      throw error
+    }
+  }
+
   // Se não há usuário logado, mostrar tela de autenticação
   if (!usuario) {
     return <TelaAuth onLogin={handleLogin} />
@@ -365,18 +446,22 @@ export default function App(){
 
   return (
     <div className="app">
-      <Header usuario={usuario} onLogout={handleLogout} />
+      <Header 
+        usuario={usuario} 
+        onLogout={handleLogout} 
+        onConfiguracoes={() => setMostrarConfiguracoes(true)} 
+      />
 
       <div className="container">
 
         <div className="topbar">
           <div className="tabs">
-            <div className={['tab', aba==='dashboard'?'ativo':''].join(' ')} onClick={()=>setAba('dashboard')}>Dashboard</div>
-            <div className={['tab', aba==='gastos'?'ativo':''].join(' ')} onClick={()=>setAba('gastos')}>Gastos e Parcelas</div>
-            <div className={['tab', aba==='fixos'?'ativo':''].join(' ')} onClick={()=>setAba('fixos')}>Gastos Fixos</div>
+            <div className={['tab', aba === 'dashboard' ? 'ativo' : ''].join(' ')} onClick={() => setAba('dashboard')}>Dashboard</div>
+            <div className={['tab', aba === 'gastos' ? 'ativo' : ''].join(' ')} onClick={() => setAba('gastos')}>Gastos e Parcelas</div>
+            <div className={['tab', aba === 'fixos' ? 'ativo' : ''].join(' ')} onClick={() => setAba('fixos')}>Gastos Fixos</div>
           </div>
 
-          <button className="btn-mostrar" onClick={()=>setMostrar(v=>!v)}>
+          <button className="btn-mostrar" onClick={handleMostrarValores}>
             <IconeOlho /> {mostrar ? 'Ocultar Valores' : 'Mostrar Valores'}
           </button>
         </div>
@@ -385,22 +470,22 @@ export default function App(){
         <div className="menu-mobile">
           <div className="menu-mobile-items">
             <div
-              className={['menu-mobile-item', aba==='dashboard'?'ativo':''].join(' ')}
-              onClick={()=>setAba('dashboard')}
+              className={['menu-mobile-item', aba === 'dashboard' ? 'ativo' : ''].join(' ')}
+              onClick={() => setAba('dashboard')}
             >
               <i className="fas fa-tachometer-alt"></i>
               <span>Dashboard</span>
             </div>
             <div
-              className={['menu-mobile-item', aba==='gastos'?'ativo':''].join(' ')}
-              onClick={()=>setAba('gastos')}
+              className={['menu-mobile-item', aba === 'gastos' ? 'ativo' : ''].join(' ')}
+              onClick={() => setAba('gastos')}
             >
               <i className="fas fa-credit-card"></i>
               <span>Gastos e Parcelas</span>
             </div>
             <div
-              className={['menu-mobile-item', aba==='fixos'?'ativo':''].join(' ')}
-              onClick={()=>setAba('fixos')}
+              className={['menu-mobile-item', aba === 'fixos' ? 'ativo' : ''].join(' ')}
+              onClick={() => setAba('fixos')}
             >
               <i className="fas fa-calendar-alt"></i>
               <span>Gastos Fixos</span>
@@ -408,41 +493,41 @@ export default function App(){
           </div>
         </div>
 
-        {aba==='dashboard' && (
+        {aba === 'dashboard' && (
           <>
             {/* Desktop Layout */}
-            <div className="grid" style={{gridTemplateColumns:'repeat(12,1fr)', display: 'none'}}>
-              <div style={{gridColumn:'span 3'}}>
+            <div className="grid" style={{ gridTemplateColumns: 'repeat(12,1fr)', display: 'none' }}>
+              <div style={{ gridColumn: 'span 3' }}>
                 <CardKPI
                   titulo="Cartão de Crédito"
-                  valorVisivel={`R$ ${kpis.totalCartaoMesAtual.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`}
+                  valorVisivel={`R$ ${kpis.totalCartaoMesAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
                   esconder={!mostrar}
                   subtitulo="Total no mês atual"
                   icone={<IconeCartao />}
                 />
               </div>
-              <div style={{gridColumn:'span 3'}}>
+              <div style={{ gridColumn: 'span 3' }}>
                 <CardKPI
                   titulo="Gastos Fixos"
-                  valorVisivel={`R$ ${kpis.totalGastosFixos.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`}
+                  valorVisivel={`R$ ${kpis.totalGastosFixos.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
                   esconder={!mostrar}
                   subtitulo="Total mensal"
                   icone={<IconeGrafico />}
                 />
               </div>
-              <div style={{gridColumn:'span 3'}}>
+              <div style={{ gridColumn: 'span 3' }}>
                 <CardKPI
                   titulo="Média Mensal"
-                  valorVisivel={`R$ ${kpis.mediaMensal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`}
+                  valorVisivel={`R$ ${kpis.mediaMensal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
                   esconder={!mostrar}
                   subtitulo="Últimos 3 meses"
                   icone={<IconeSeta />}
                 />
               </div>
-              <div style={{gridColumn:'span 3'}}>
+              <div style={{ gridColumn: 'span 3' }}>
                 <CardKPI
                   titulo="Pagamentos Atrasados"
-                  valorVisivel={<><span>R$ {kpis.totalVencidos.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span><div className='sub'>{kpis.quantidadeVencidos} item(s) atrasado(s)</div></>}
+                  valorVisivel={<><span>R$ {kpis.totalVencidos.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span><div className='sub'>{kpis.quantidadeVencidos} item(s) atrasado(s)</div></>}
                   esconder={!mostrar}
                   subtitulo=""
                   icone={<IconeAlerta />}
@@ -452,43 +537,36 @@ export default function App(){
 
             {/* Mobile Layout - Cards em coluna */}
             <div className="grid-dashboard-mobile">
-              <div className="card-kpi">
-                <CardKPI
-                  titulo="Cartão de Crédito"
-                  valorVisivel={`R$ ${kpis.totalCartaoMesAtual.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`}
-                  esconder={!mostrar}
-                  subtitulo="Total no mês atual"
-                  icone={<IconeCartao />}
-                />
-              </div>
-              <div className="card-kpi">
-                <CardKPI
-                  titulo="Gastos Fixos"
-                  valorVisivel={`R$ ${kpis.totalGastosFixos.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`}
-                  esconder={!mostrar}
-                  subtitulo="Total mensal"
-                  icone={<IconeGrafico />}
-                />
-              </div>
-              <div className="card-kpi">
-                <CardKPI
-                  titulo="Média Mensal"
-                  valorVisivel={`R$ ${kpis.mediaMensal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`}
-                  esconder={!mostrar}
-                  subtitulo="Últimos 3 meses"
-                  icone={<IconeSeta />}
-                />
-              </div>
-              <div className="card-kpi">
-                <CardKPI
-                  titulo="Pagamentos Atrasados"
-                  valorVisivel={<><span>R$ {kpis.totalVencidos.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span><div className='sub'>{kpis.quantidadeVencidos} item(s) atrasado(s)</div></>}
-                  esconder={!mostrar}
-                  subtitulo=""
-                  icone={<IconeAlerta />}
-                />
-              </div>
-
+              <CardKPI
+                titulo="Cartão de Crédito"
+                valorVisivel={`R$ ${kpis.totalCartaoMesAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+                esconder={!mostrar}
+                subtitulo="Total no mês atual"
+                icone={<IconeCartao />}
+              />
+              <CardKPI
+                titulo="Gastos Fixos"
+                valorVisivel={`R$ ${kpis.totalGastosFixos.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+                esconder={!mostrar}
+                subtitulo="Total mensal"
+                icone={<IconeGrafico />}
+              />
+              <CardKPI
+                titulo="Média Mensal"
+                valorVisivel={`R$ ${kpis.mediaMensal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+                esconder={!mostrar}
+                subtitulo="Últimos 3 meses"
+                icone={<IconeSeta />}
+              />
+              <CardKPI
+                titulo="Pagamentos Atrasados"
+                valorVisivel={<><span>R$ {kpis.totalVencidos.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span><div className='sub'>{kpis.quantidadeVencidos} item(s) atrasado(s)</div></>}
+                esconder={!mostrar}
+                subtitulo=""
+                icone={<IconeAlerta />}
+              />
+              
+              {/* Gráficos Mobile - um embaixo do outro */}
               <div className="card">
                 <h4>Distribuição por Tipo de Gasto</h4>
                 <div className="sub">Proporção de gastos por método de pagamento</div>
@@ -507,8 +585,8 @@ export default function App(){
             </div>
 
             {/* Desktop Layout - Gráficos lado a lado */}
-            <div className="grid" style={{gridTemplateColumns:'repeat(12,1fr)', display: 'none'}}>
-              <div style={{gridColumn:'span 6'}} className="card">
+            <div className="grid" style={{ gridTemplateColumns: 'repeat(12,1fr)', display: 'none' }}>
+              <div style={{ gridColumn: 'span 6' }} className="card">
                 <h4>Distribuição por Tipo de Gasto</h4>
                 <div className="sub">Proporção de gastos por método de pagamento</div>
                 <div className="area-graficos">
@@ -516,7 +594,7 @@ export default function App(){
                 </div>
               </div>
 
-              <div style={{gridColumn:'span 6'}} className="card">
+              <div style={{ gridColumn: 'span 6' }} className="card">
                 <h4>Evolução de Gastos</h4>
                 <div className="sub">Total de gastos nos últimos 6 meses</div>
                 <div className="area-graficos">
@@ -527,18 +605,18 @@ export default function App(){
           </>
         )}
 
-        {aba==='gastos' && (
+        {aba === 'gastos' && (
           <>
             {/* Desktop Layout */}
-            <div className="grid" style={{gridTemplateColumns:'repeat(12,1fr)', display: 'none'}}>
-              <div style={{gridColumn:'span 5'}}>
+            <div className="grid" style={{ gridTemplateColumns: 'repeat(12,1fr)', display: 'none' }}>
+              <div style={{ gridColumn: 'span 5' }}>
                 <FormularioGasto
                   gasto={gastoEdicao}
                   onSalvar={salvarGasto}
                   onCancelar={cancelarEdicaoGasto}
                 />
               </div>
-              <div style={{gridColumn:'span 7'}}>
+              <div style={{ gridColumn: 'span 7' }}>
                 <ListaGastos
                   gastos={gastos}
                   onEditar={editarGasto}
@@ -567,18 +645,18 @@ export default function App(){
           </>
         )}
 
-        {aba==='fixos' && (
+        {aba === 'fixos' && (
           <>
             {/* Desktop Layout */}
-            <div className="grid" style={{gridTemplateColumns:'repeat(12,1fr)', display: 'none'}}>
-              <div style={{gridColumn:'span 5'}}>
+            <div className="grid" style={{ gridTemplateColumns: 'repeat(12,1fr)', display: 'none' }}>
+              <div style={{ gridColumn: 'span 5' }}>
                 <FormularioGastoFixo
                   gastoFixo={gastoFixoEdicao}
                   onSalvar={salvarGastoFixo}
                   onCancelar={cancelarEdicaoGastoFixo}
                 />
               </div>
-              <div style={{gridColumn:'span 7'}}>
+              <div style={{ gridColumn: 'span 7' }}>
                 <ListaGastosFixos
                   gastosFixos={gastosFixos}
                   onEditar={editarGastoFixo}
@@ -607,6 +685,25 @@ export default function App(){
           </>
         )}
       </div>
-    </div>
+
+      <ModalSenha
+        aberto={modalSenhaAberto}
+        onFechar={() => setModalSenhaAberto(false)}
+        onConfirmar={handleConfirmarSenha}
+        carregando={carregandoModal}
+      />
+
+      {mostrarConfiguracoes && (
+        <div className="modal-overlay">
+          <div className="modal-configuracoes">
+            <ConfiguracaoUsuario
+              usuario={usuario}
+              onSalvar={handleSalvarConfiguracoes}
+              onCancelar={() => setMostrarConfiguracoes(false)}
+            />
+          </div>
+        </div>
+      )}
+    </div >
   )
 }

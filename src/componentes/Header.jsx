@@ -1,7 +1,7 @@
 
 import React from 'react'
 
-export default function Header({ usuario, onLogout }) {
+export default function Header({ usuario, onLogout, onConfiguracoes }) {
   return (
     <header className="header">
       <div className="header-titulo">
@@ -9,7 +9,7 @@ export default function Header({ usuario, onLogout }) {
         <h1>Gestão Financeira</h1>
       </div>
       <div className="header-usuario">
-        <div className="usuario-info">
+        <div className="usuario-info" onClick={onConfiguracoes}>
           <i className="fas fa-user"></i>
           <span className="usuario-nome">Olá, <strong>{usuario.usuario}!</strong></span>
         </div>

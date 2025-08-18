@@ -2,7 +2,7 @@ import React from 'react'
 
 export default function CardKPI({ titulo, valorVisivel, esconder, subtitulo, icone }){
   return (
-    <div className="card">
+    <div className="card card-kpi">
       <div className="kpi">
         <h4>{titulo}</h4>
         {icone}
