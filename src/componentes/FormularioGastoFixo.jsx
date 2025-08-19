@@ -6,23 +6,25 @@ export default function FormularioGastoFixo({ gastoFixo, onSalvar, onCancelar })
     descricao: '',
     valor: '',
     tipo: 'Débito Automático',
-    diaVencimento: '1',
+    dataVencimento: '',
     categoria: ''
   })
 
   useEffect(() => {
     if (gastoFixo) {
-      setFormData(gastoFixo)
+      setFormData({
+        ...gastoFixo,
+        dataVencimento: gastoFixo.dataVencimento ? new Date(gastoFixo.dataVencimento).toISOString().split('T')[0] : ''
+      })
     }
   }, [gastoFixo])
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (formData.descricao && formData.valor && formData.diaVencimento) {
+    if (formData.descricao && formData.valor && formData.dataVencimento) {
       const dadosParaSalvar = {
         ...formData,
-        valor: parseFloat(formData.valor),
-        diaVencimento: parseInt(formData.diaVencimento)
+        valor: parseFloat(formData.valor)
       }
       if (gastoFixo) {
         dadosParaSalvar.id = gastoFixo.id
@@ -33,7 +35,7 @@ export default function FormularioGastoFixo({ gastoFixo, onSalvar, onCancelar })
           descricao: '',
           valor: '',
           tipo: 'Débito Automático',
-          diaVencimento: '1',
+          dataVencimento: '',
           categoria: ''
         })
       }
@@ -79,15 +81,13 @@ export default function FormularioGastoFixo({ gastoFixo, onSalvar, onCancelar })
         </div>
         
         <div className="campo">
-          <label>Dia do Vencimento</label>
-          <select
-            value={formData.diaVencimento}
-            onChange={(e) => setFormData({...formData, diaVencimento: e.target.value})}
-          >
-            {Array.from({length: 31}, (_, i) => (
-              <option key={i + 1} value={i + 1}>{i + 1}</option>
-            ))}
-          </select>
+          <label>Data de Vencimento</label>
+          <input
+            type="date"
+            value={formData.dataVencimento}
+            onChange={(e) => setFormData({...formData, dataVencimento: e.target.value})}
+            required
+          />
         </div>
         
         <div className="campo">

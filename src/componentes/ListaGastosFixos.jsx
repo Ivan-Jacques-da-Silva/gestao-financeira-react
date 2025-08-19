@@ -9,7 +9,7 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
   const [statusFiltro, setStatusFiltro] = useState('')
   const [gastosFixosFiltrados, setGastosFixosFiltrados] = useState([])
 
-  
+
 
   // Aplicar filtros quando gastosFixos ou filtros mudarem
   useEffect(() => {
@@ -47,7 +47,7 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
     // Ordenar por dia de vencimento (mais próximo primeiro no mês atual)
     const hoje = new Date()
     const diaAtual = hoje.getDate()
-    
+
     resultado.sort((a, b) => {
       // Calcular distância até o próximo vencimento
       const calcularDistancia = (diaVencimento) => {
@@ -57,10 +57,10 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
           return (30 - diaAtual) + diaVencimento // Vencimento no próximo mês
         }
       }
-      
+
       const distanciaA = calcularDistancia(a.diaVencimento)
       const distanciaB = calcularDistancia(b.diaVencimento)
-      
+
       return distanciaA - distanciaB
     })
 
@@ -82,14 +82,16 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
   }
 
   const calcularStatus = (gastoFixo) => {
-    const hoje = new Date()
-    const diaAtual = hoje.getDate()
-    const diasParaVencimento = gastoFixo.diaVencimento - diaAtual
-
     if (gastoFixo.status === 'pago') return 'pago'
-    if (diasParaVencimento < 0) return 'vencido'
-    if (diasParaVencimento <= 10 && diasParaVencimento >= 0) return 'a_vencer'
-    return 'a_vencer'
+
+    const hoje = new Date()
+    const dataVencimento = new Date(gastoFixo.dataVencimento)
+
+    const diasParaVencimento = Math.ceil((dataVencimento - hoje) / (1000 * 60 * 60 * 24))
+
+    if (diasParaVencimento < 0) return 'atrasado'
+    if (diasParaVencimento <= 3) return 'a_vencer'
+    return 'futuro'
   }
 
   const getBadgeTipo = (tipo) => {
@@ -103,8 +105,9 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
   const getStatusLabel = (status) => {
     const labels = {
       'pago': 'Pago',
-      'vencido': 'Vencido',
-      'a_vencer': 'A Vencer'
+      'atrasado': 'Atrasado',
+      'a_vencer': 'A Vencer',
+      'futuro': 'Futuro'
     }
     return labels[status] || 'A Vencer'
   }
@@ -136,7 +139,7 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
           )
           setGastosFixos(gastosFixosAtualizados)
         }
-        
+
         // Disparar evento para atualizar outros componentes
         window.dispatchEvent(new CustomEvent('atualizarGastosFixos'))
       }
@@ -157,7 +160,7 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
     }
   }
 
-  
+
 
   return (
     <div className="card">
@@ -194,7 +197,8 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
               <option value="">Todos os Status</option>
               <option value="pago">🟢 Pago</option>
               <option value="a_vencer">🟡 A Vencer</option>
-              <option value="vencido">🔴 Vencido</option>
+              <option value="atrasado">🔴 Atrasado</option>
+              <option value="futuro">🔵 Futuro</option>
             </select>
           </div>
           <button className="btn-limpar-filtros" onClick={limparFiltros}>
@@ -258,7 +262,7 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
                           {gastoFixo.tipo}
                         </span>
                       </td>
-                      <td>Dia {gastoFixo.diaVencimento}</td>
+                      <td>{new Date(gastoFixo.dataVencimento).toLocaleDateString('pt-BR')}</td>
                       <td>{gastoFixo.categoria || '-'}</td>
                       <td>
                         <div className="status-container">
@@ -308,7 +312,7 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
                     <div className="card-detalhes">
                       <div className="card-detalhe">
                         <span className="card-detalhe-label">Vencimento</span>
-                        <span className="card-detalhe-valor">Dia {gastoFixo.diaVencimento}</span>
+                        <span className="card-detalhe-valor">{new Date(gastoFixo.dataVencimento).toLocaleDateString('pt-BR')}</span>
                       </div>
                       <div className="card-detalhe">
                         <span className="card-detalhe-label">Tipo</span>

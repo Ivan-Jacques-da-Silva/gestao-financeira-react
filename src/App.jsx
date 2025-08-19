@@ -269,9 +269,7 @@ export default function App() {
     const gastosFixosAtrasados = gastosFixos.filter(gf => {
       if (gf.status === 'pago') return false
 
-      // Para gastos fixos, considera o dia do vencimento no mês atual
-      const diaVencimento = gf.diaVencimento || 1
-      const dataVencimento = new Date(anoAtual, mesAtual, diaVencimento)
+      const dataVencimento = new Date(gf.dataVencimento)
       return dataVencimento < hoje
     })
 
