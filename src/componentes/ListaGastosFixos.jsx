@@ -6,6 +6,7 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
   const [paginaAtual, setPaginaAtual] = useState(1)
   const [dataInicial, setDataInicial] = useState('')
   const [dataFinal, setDataFinal] = useState('')
+  const [statusFiltro, setStatusFiltro] = useState('')
   const [gastosFixosFiltrados, setGastosFixosFiltrados] = useState([])
 
   // Aplicar filtros quando gastosFixos ou filtros mudarem
@@ -33,6 +34,14 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
       })
     }
 
+    // Filtro por status
+    if (statusFiltro) {
+      resultado = resultado.filter(gastoFixo => {
+        const status = calcularStatus(gastoFixo)
+        return status === statusFiltro
+      })
+    }
+
     // Ordenar por dia de vencimento (mais próximo primeiro no mês atual)
     const hoje = new Date()
     const diaAtual = hoje.getDate()
@@ -55,7 +64,7 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
 
     setGastosFixosFiltrados(resultado)
     setPaginaAtual(1) // Reset para primeira página ao filtrar
-  }, [gastosFixos, dataInicial, dataFinal])
+  }, [gastosFixos, dataInicial, dataFinal, statusFiltro])
 
   // Calcular paginação
   const totalPaginas = Math.ceil(gastosFixosFiltrados.length / itensPorPagina)
@@ -121,6 +130,7 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
   const limparFiltros = () => {
     setDataInicial('')
     setDataFinal('')
+    setStatusFiltro('')
   }
 
   const irParaPagina = (pagina) => {
@@ -161,6 +171,19 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
               onChange={(e) => setDataFinal(e.target.value)}
               className="input-filtro"
             />
+          </div>
+          <div className="campo-filtro">
+            <label>Status</label>
+            <select
+              value={statusFiltro}
+              onChange={(e) => setStatusFiltro(e.target.value)}
+              className="select-filtro"
+            >
+              <option value="">Todos os Status</option>
+              <option value="pago">🟢 Pago</option>
+              <option value="a_vencer">🟡 A Vencer</option>
+              <option value="vencido">🔴 Vencido</option>
+            </select>
           </div>
           <button className="btn-limpar-filtros" onClick={limparFiltros}>
             Limpar Filtros

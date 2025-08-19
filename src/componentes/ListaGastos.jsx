@@ -6,6 +6,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir }) {
   const [paginaAtual, setPaginaAtual] = useState(1)
   const [dataInicial, setDataInicial] = useState('')
   const [dataFinal, setDataFinal] = useState('')
+  const [statusFiltro, setStatusFiltro] = useState('')
   const [gastosFiltrados, setGastosFiltrados] = useState([])
 
   // Aplicar filtros quando gastos ou filtros mudarem
@@ -25,12 +26,20 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir }) {
       })
     }
 
+    // Filtro por status
+    if (statusFiltro) {
+      resultado = resultado.filter(gasto => {
+        const status = calcularStatus(gasto)
+        return status === statusFiltro
+      })
+    }
+
     // Ordenar por data (mais recente primeiro)
     resultado.sort((a, b) => new Date(b.data) - new Date(a.data))
 
     setGastosFiltrados(resultado)
     setPaginaAtual(1) // Reset para primeira página ao filtrar
-  }, [gastos, dataInicial, dataFinal])
+  }, [gastos, dataInicial, dataFinal, statusFiltro])
 
   // Calcular paginação
   const totalPaginas = Math.ceil(gastosFiltrados.length / itensPorPagina)
@@ -100,6 +109,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir }) {
   const limparFiltros = () => {
     setDataInicial('')
     setDataFinal('')
+    setStatusFiltro('')
   }
 
   const irParaPagina = (pagina) => {
@@ -132,6 +142,19 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir }) {
               onChange={(e) => setDataFinal(e.target.value)}
               className="input-filtro"
             />
+          </div>
+          <div className="campo-filtro">
+            <label>Status</label>
+            <select
+              value={statusFiltro}
+              onChange={(e) => setStatusFiltro(e.target.value)}
+              className="select-filtro"
+            >
+              <option value="">Todos os Status</option>
+              <option value="pago">🟢 Pago</option>
+              <option value="a_vencer">🟡 A Vencer</option>
+              <option value="vencido">🔴 Vencido</option>
+            </select>
           </div>
           <button className="btn-limpar-filtros" onClick={limparFiltros}>
             Limpar Filtros

@@ -1,4 +1,3 @@
-
 :root {
   --cor-primaria: #16a085;
   --cor-primaria-escura: #0f7a64;
@@ -1957,12 +1956,12 @@ body {
   .input-senha {
     padding: 12px 48px 12px 14px !important;
   }
-  
+
   .botao-mostrar-senha {
     right: 10px;
     padding: 6px;
   }
-  
+
   .icone-senha {
     width: 16px;
     height: 16px;
@@ -1972,19 +1971,19 @@ body {
     margin: 16px;
     max-width: calc(100% - 32px);
   }
-  
+
   .modal-header {
     padding: 16px 20px;
   }
-  
+
   .modal-body {
     padding: 20px;
   }
-  
+
   .modal-footer {
     flex-direction: column-reverse;
   }
-  
+
   .btn-primario,
   .btn-secundario {
     width: 100%;
@@ -1999,36 +1998,36 @@ body {
   .tela-auth {
     padding: 12px;
   }
-  
+
   .auth-container {
     padding: 24px 20px;
     border-radius: 16px;
     max-width: 95vw;
     margin: 0 auto;
   }
-  
+
   .auth-header h1 {
     font-size: 22px;
   }
-  
+
   .auth-header p {
     font-size: 14px;
   }
-  
+
   .auth-icone {
     font-size: 36px;
   }
-  
+
   .auth-form {
     gap: 16px;
   }
-  
+
   .form-grupo input,
   .form-grupo select {
     padding: 12px 14px;
     font-size: 16px;
   }
-  
+
   .auth-botao {
     padding: 14px 20px;
     font-size: 15px;
@@ -2183,7 +2182,7 @@ body {
   .input-senha {
     padding: 12px 46px 12px 12px !important;
   }
-  
+
   .botao-mostrar-senha {
     right: 8px;
     padding: 4px;
@@ -2197,46 +2196,147 @@ body {
   .tela-auth {
     padding: 8px;
   }
-  
+
   .auth-container {
     padding: 20px 16px;
     border-radius: 12px;
     max-width: 98vw;
   }
-  
+
   .auth-header {
     margin-bottom: 24px;
   }
-  
+
   .auth-header h1 {
     font-size: 20px;
   }
-  
+
   .auth-icone {
     font-size: 32px;
     margin-bottom: 12px;
   }
-  
+
   .auth-tabs {
     margin-bottom: 20px;
   }
-  
+
   .auth-tab {
     padding: 10px 12px;
     font-size: 13px;
   }
-  
+
   .form-grupo {
     gap: 6px;
   }
-  
+
   .form-grupo label {
     font-size: 13px;
   }
-  
+
   .form-grupo input,
   .form-grupo select {
     padding: 12px 12px;
     font-size: 16px;
   }
 }
+
+/* Adiciona estilos para o select de filtro de cores */
+.filtro-cores-select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  width: 100%;
+  min-width: 0;
+  height: 42px;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative; /* Necessário para posicionar o ícone */
+}
+
+.filtro-cores-select:focus {
+  outline: none;
+  border-color: var(--cor-primaria);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.filtro-cores-select .icone-cor {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+  flex-shrink: 0; /* Impede que o ícone encolha */
+}
+
+.filtro-cores-select .label-filtro {
+  flex-grow: 1; /* Permite que o label ocupe o espaço restante */
+  min-width: 0; /* Necessário para que o texto quebre corretamente */
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.filtro-cores-select .dropdown-arrow {
+  margin-left: auto; /* Empurra a seta para a direita */
+  font-size: 12px;
+  color: #6b7280;
+  transition: transform 0.2s ease;
+}
+
+.filtro-cores-select.aberto .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.options-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid var(--cor-borda);
+  border-radius: 8px;
+  box-shadow: var(--sombra);
+  z-index: 10;
+  margin-top: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.option-item {
+  padding: 10px 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.option-item:hover {
+  background: #f8fafc;
+}
+
+.option-item .icone-cor {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.option-item .nome-cor {
+  flex-grow: 1;
+  min-width: 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Estilos específicos para as cores */
+.icone-cor.pago { background-color: #22c55e; } /* Verde */
+.icone-cor.vencido { background-color: #ef4444; } /* Vermelho */
+.icone-cor.a-vencer { background-color: #f59e0b; } /* Amarelo/Laranja */
