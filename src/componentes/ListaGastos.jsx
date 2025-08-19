@@ -10,7 +10,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
   const [termoPesquisa, setTermoPesquisa] = useState('')
   const [gastosFiltrados, setGastosFiltrados] = useState([])
 
-  
+
 
   // Aplicar filtros quando gastos ou filtros mudarem
   useEffect(() => {
@@ -123,7 +123,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
           )
           setGastos(gastosAtualizados)
         }
-        
+
         // Disparar evento para atualizar outros componentes
         window.dispatchEvent(new CustomEvent('atualizarGastos'))
       }
@@ -149,38 +149,38 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
   const gerarNumerosPaginas = () => {
     const nums = []
     const delta = 2 // Quantas páginas mostrar antes e depois da atual
-    
+
     // Sempre incluir primeira página
     if (totalPaginas > 1) {
       nums.push(1)
     }
-    
+
     // Calcular início e fim do range central
     let inicio = Math.max(2, paginaAtual - delta)
     let fim = Math.min(totalPaginas - 1, paginaAtual + delta)
-    
+
     // Adicionar elipse no início se necessário
     if (inicio > 2) {
       nums.push('...')
     }
-    
+
     // Adicionar páginas do range central
     for (let i = inicio; i <= fim; i++) {
       if (i > 1 && i < totalPaginas) {
         nums.push(i)
       }
     }
-    
+
     // Adicionar elipse no final se necessário
     if (fim < totalPaginas - 1) {
       nums.push('...')
     }
-    
+
     // Sempre incluir última página
     if (totalPaginas > 1) {
       nums.push(totalPaginas)
     }
-    
+
     return nums
   }
 
@@ -367,9 +367,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
                       </div>
                       <div className="card-detalhe">
                         <span className="card-detalhe-label">Parcelas</span>
-                        <span className="card-detalhe-valor">
-                          {gasto.parcelas > 1 ? `${gasto.parcelas}x` : '1x'}
-                        </span>
+                        <span className="card-detalhe-valor">{gasto.totalParcelas > 1 ? `${gasto.parcelas}/${gasto.totalParcelas}` : '1x'}</span>
                       </div>
                       <div className="card-detalhe">
                         <span className="card-detalhe-label">Categoria</span>

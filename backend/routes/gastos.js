@@ -55,11 +55,12 @@ router.post('/', async (req, res) => {
       dataParcelada.setMonth(dataParcelada.getMonth() + i)
       
       gastosParaCriar.push({
-        descricao: numeroParcelas > 1 ? `${descricao} - Parcela ${i + 1}/${numeroParcelas}` : descricao,
+        descricao: descricao,
         valor: valorParcela,
         tipo,
         data: dataParcelada,
-        parcelas: 1, // Cada item criado é uma única parcela
+        parcelas: i + 1, // Número da parcela atual
+        totalParcelas: numeroParcelas, // Total de parcelas
         categoria,
         status: status || 'a_vencer',
         usuarioId: req.usuario.id

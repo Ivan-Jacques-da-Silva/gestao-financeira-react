@@ -25,18 +25,19 @@ model Usuario {
 }
 
 model Gasto {
-  id        Int      @id @default(autoincrement())
-  descricao String
-  valor     Float
-  tipo      String
-  data      DateTime
-  parcelas  Int      @default(1)
-  categoria String?
-  status    String   @default("a_vencer")
-  usuarioId Int
-  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  descricao    String
+  valor        Float
+  tipo         String
+  data         DateTime
+  parcelas     Int      @default(1)
+  totalParcelas Int     @default(1)
+  categoria    String?
+  status       String   @default("a_vencer")
+  usuarioId    Int
+  usuario      Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@map("gastos")
 }
