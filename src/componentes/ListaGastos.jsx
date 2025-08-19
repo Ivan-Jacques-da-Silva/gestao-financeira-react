@@ -18,7 +18,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
 
     // Filtro por pesquisa de descrição
     if (termoPesquisa) {
-      resultado = resultado.filter(gasto => 
+      resultado = resultado.filter(gasto =>
         gasto.descricao.toLowerCase().includes(termoPesquisa.toLowerCase())
       )
     }
@@ -118,7 +118,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
       if (response.ok) {
         // Atualizar o estado no componente pai
         if (setGastos) {
-          const gastosAtualizados = gastos.map(g => 
+          const gastosAtualizados = gastos.map(g =>
             g.id === gasto.id ? { ...g, status: novoStatus } : g
           )
           setGastos(gastosAtualizados)
@@ -232,20 +232,19 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
               <option value="vencido">🔴 Vencido</option>
             </select>
           </div>
+          </div>
+        
+        <div className="controles-linha">
           <button className="btn-limpar-filtros" onClick={limparFiltros}>
             Limpar Filtros
           </button>
-        </div>
 
-        <div className="controles-paginacao">
-          <div className="campo-filtro">
-            <label>Itens por página</label>
+          <div className="controles-paginacao">
+            <label htmlFor="itensPorPagina">Itens por página:</label>
             <select
+              id="itensPorPagina"
               value={itensPorPagina}
-              onChange={(e) => {
-                setItensPorPagina(parseInt(e.target.value))
-                setPaginaAtual(1)
-              }}
+              onChange={(e) => setItensPorPagina(Number(e.target.value))}
               className="select-itens"
             >
               <option value={10}>10</option>
@@ -254,8 +253,9 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
             </select>
           </div>
         </div>
-      </div>
+        </div>
 
+        
       {gastosFiltrados.length === 0 ? (
         <div className="lista-vazia">
           <div className="sub">
@@ -448,6 +448,6 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
           </div>
         </>
       )}
-    </div>
+    </div >
   )
 }

@@ -1,3 +1,4 @@
+
 // seed.js
 import { PrismaClient } from '@prisma/client'
 
@@ -10,16 +11,16 @@ const MES_REF = 7 // agosto (0=jan)
 
 // ===== FIXOS (somente valor de agosto) =====
 const fixosAgosto = [
-  { descricao: 'Internet',       valor: 99.90,  tipo: 'Débito',            diaVencimento: 10, categoria: 'Telecomunicações' },
-  { descricao: 'Luz',            valor: 363.00, tipo: 'Débito',            diaVencimento: 25, categoria: 'Utilidades' },
-  { descricao: 'Água',           valor: 132.00, tipo: 'Débito',            diaVencimento: 18, categoria: 'Utilidades' },
-  { descricao: 'Unimed',         valor: 639.80, tipo: 'Débito',            diaVencimento: 12, categoria: 'Saúde' },
-  { descricao: 'Gasolina',       valor: 500.00, tipo: 'Pix',               diaVencimento: 1,  categoria: 'Transporte' },
-  { descricao: 'Limite Banri',   valor: 117.00, tipo: 'Cartão de Crédito', diaVencimento: 30, categoria: 'Financeiro' },
-  { descricao: 'Curso Teologia', valor: 200.00, tipo: 'Cartão de Crédito', diaVencimento: 5,  categoria: 'Educação' },
-  { descricao: 'Curso Inglês',   valor: 250.00, tipo: 'Cartão de Crédito', diaVencimento: 8,  categoria: 'Educação' },
-  { descricao: 'Napoleon Host',  valor: 16.99,  tipo: 'Cartão de Crédito', diaVencimento: 15, categoria: 'Tecnologia' },
-  { descricao: 'MEI RF (Fev)',   valor: 80.90,  tipo: 'Dinheiro',          diaVencimento: 20, categoria: 'Impostos' },
+  { descricao: 'Internet',       valor: 99.90,  tipo: 'Débito',            dataVencimento: new Date(ANO, MES_REF, 10), categoria: 'Telecomunicações' },
+  { descricao: 'Luz',            valor: 363.00, tipo: 'Débito',            dataVencimento: new Date(ANO, MES_REF, 25), categoria: 'Utilidades' },
+  { descricao: 'Água',           valor: 132.00, tipo: 'Débito',            dataVencimento: new Date(ANO, MES_REF, 18), categoria: 'Utilidades' },
+  { descricao: 'Unimed',         valor: 639.80, tipo: 'Débito',            dataVencimento: new Date(ANO, MES_REF, 12), categoria: 'Saúde' },
+  { descricao: 'Gasolina',       valor: 500.00, tipo: 'Pix',               dataVencimento: new Date(ANO, MES_REF, 1),  categoria: 'Transporte' },
+  { descricao: 'Limite Banri',   valor: 117.00, tipo: 'Cartão de Crédito', dataVencimento: new Date(ANO, MES_REF, 30), categoria: 'Financeiro' },
+  { descricao: 'Curso Teologia', valor: 200.00, tipo: 'Cartão de Crédito', dataVencimento: new Date(ANO, MES_REF, 5),  categoria: 'Educação' },
+  { descricao: 'Curso Inglês',   valor: 250.00, tipo: 'Cartão de Crédito', dataVencimento: new Date(ANO, MES_REF, 8),  categoria: 'Educação' },
+  { descricao: 'Napoleon Host',  valor: 16.99,  tipo: 'Cartão de Crédito', dataVencimento: new Date(ANO, MES_REF, 15), categoria: 'Tecnologia' },
+  { descricao: 'MEI RF (Fev)',   valor: 80.90,  tipo: 'Dinheiro',          dataVencimento: new Date(ANO, MES_REF, 20), categoria: 'Impostos' },
 ]
 
 // ===== PARCELAS (JAN..AGO da planilha) =====
@@ -54,7 +55,8 @@ function montarVariaveisDaPlanilha() {
         valor: Number(v),
         tipo,
         data: new Date(ANO, mes, 1),
-        parcelas: 1,
+        parcelas: idx, // Número da parcela atual
+        totalParcelas: totalParcelas, // Total de parcelas
         categoria,
         status: mes < MES_REF ? 'pago' : 'a_vencer',
       })

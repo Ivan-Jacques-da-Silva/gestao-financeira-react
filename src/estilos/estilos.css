@@ -672,18 +672,24 @@ body {
 
 .filtros-data {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
   align-items: end;
   width: 100%;
 }
 
+.controles-linha {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  gap: 15px;
+}
+
 .controles-paginacao {
   display: flex;
-  gap: 12px;
-  align-items: flex-end;
-  justify-content: space-between;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
 }
 
 .campo-filtro {
@@ -1950,6 +1956,17 @@ body {
     grid-template-columns: 1fr 1fr;
     gap: 10px;
   }
+  
+  .controles-linha {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+  
+  .controles-paginacao {
+    justify-content: space-between;
+    width: 100%;
+  }
 
   .controles-paginacao {
     justify-content: center;
@@ -2182,6 +2199,12 @@ body {
 
   .formulario-content .formulario {
     padding: 5px;
+  }
+}
+
+@media (max-width: 768px) and (min-width: 481px) {
+  .filtros-data {
+    grid-template-columns: 1fr 1fr 1fr;
   }
 }
 

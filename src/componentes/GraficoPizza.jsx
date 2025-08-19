@@ -82,13 +82,13 @@ export default function GraficoPizza({ dados = [], esconder = false }){
           ? '•••••' 
           : new Intl.NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'}).format(d.valor)
         
-        const porcentagem = ((d.valor/total)*100).toFixed(1) + '%'
+        const porcentagem = ((d.valor/total)*100).toFixed(1)
         
         setTooltip({
           show: true,
           x: event.clientX,
           y: event.clientY,
-          text: `${d.rotulo}: ${valor} (${porcentagem})`
+          text: `${d.rotulo}|${valor}|${porcentagem}%`
         })
         return
       }
@@ -249,18 +249,58 @@ export default function GraficoPizza({ dados = [], esconder = false }){
             position: 'fixed',
             left: tooltip.x + 10,
             top: tooltip.y - 10,
-            background: 'rgba(0,0,0,0.8)',
+            background: 'rgba(0,0,0,0.9)',
             color: 'white',
-            padding: '6px 12px',
-            borderRadius: '6px',
+            padding: '8px 12px',
+            borderRadius: '8px',
             fontSize: '12px',
             fontWeight: '500',
             pointerEvents: 'none',
             zIndex: 1000,
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+            boxShadow: '0 6px 20px rgba(0,0,0,0.25)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            minWidth: '120px'
           }}
         >
-          {tooltip.text}
+          {(() => {
+            const [rotulo, valor, porcentagem] = tooltip.text.split('|')
+            return (
+              <div style={{ textAlign: 'left' }}>
+                <div style={{ 
+                  fontWeight: '600', 
+                  marginBottom: '4px',
+                  color: '#ffffff'
+                }}>
+                  {rotulo}
+                </div>
+                <div style={{ 
+                  fontSize: '11px', 
+                  color: '#e5e7eb',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <span>Valor:</span>
+                  <span style={{ fontWeight: '600' }}>{valor}</span>
+                </div>
+                <div style={{ 
+                  fontSize: '11px', 
+                  color: '#e5e7eb',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '2px'
+                }}>
+                  <span>Proporção:</span>
+                  <span style={{ 
+                    fontWeight: '700',
+                    color: '#10b981',
+                    fontSize: '12px'
+                  }}>{porcentagem}</span>
+                </div>
+              </div>
+            )
+          })()}
         </div>
       )}
     </div>

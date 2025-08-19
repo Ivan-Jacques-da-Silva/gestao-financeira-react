@@ -1,214 +1,228 @@
-import React, { useState, useEffect } from 'react'
-import { IconeEditar, IconeExcluir } from './Icones.jsx'
+import React, { useState, useEffect } from "react";
+import { IconeEditar, IconeExcluir } from "./Icones.jsx";
 
-export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir, setGastosFixos }) {
-  const [itensPorPagina, setItensPorPagina] = useState(10)
-  const [paginaAtual, setPaginaAtual] = useState(1)
-  const [dataInicial, setDataInicial] = useState('')
-  const [dataFinal, setDataFinal] = useState('')
-  const [statusFiltro, setStatusFiltro] = useState('')
-  const [termoPesquisa, setTermoPesquisa] = useState('')
-  const [gastosFixosFiltrados, setGastosFixosFiltrados] = useState([])
-
-
+export default function ListaGastosFixos({
+  gastosFixos = [],
+  onEditar,
+  onExcluir,
+  setGastosFixos,
+}) {
+  const [itensPorPagina, setItensPorPagina] = useState(10);
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const [dataInicial, setDataInicial] = useState("");
+  const [dataFinal, setDataFinal] = useState("");
+  const [statusFiltro, setStatusFiltro] = useState("");
+  const [termoPesquisa, setTermoPesquisa] = useState("");
+  const [gastosFixosFiltrados, setGastosFixosFiltrados] = useState([]);
 
   // Aplicar filtros quando gastosFixos ou filtros mudarem
   useEffect(() => {
-    let resultado = [...gastosFixos]
+    let resultado = [...gastosFixos];
 
     // Filtro por pesquisa de descrição
     if (termoPesquisa) {
-      resultado = resultado.filter(gastoFixo => 
-        gastoFixo.descricao.toLowerCase().includes(termoPesquisa.toLowerCase())
-      )
+      resultado = resultado.filter((gastoFixo) =>
+        gastoFixo.descricao.toLowerCase().includes(termoPesquisa.toLowerCase()),
+      );
     }
 
     // Para gastos fixos, vamos filtrar pela data de criação ou próximo vencimento
     if (dataInicial || dataFinal) {
-      resultado = resultado.filter(gastoFixo => {
+      resultado = resultado.filter((gastoFixo) => {
         // Calcular próximo vencimento com base no dia do vencimento
-        const hoje = new Date()
-        const proximoVencimento = new Date(hoje.getFullYear(), hoje.getMonth(), gastoFixo.diaVencimento)
+        const hoje = new Date();
+        const proximoVencimento = new Date(
+          hoje.getFullYear(),
+          hoje.getMonth(),
+          gastoFixo.diaVencimento,
+        );
 
         // Se o dia já passou este mês, considerar o próximo mês
         if (proximoVencimento < hoje) {
-          proximoVencimento.setMonth(proximoVencimento.getMonth() + 1)
+          proximoVencimento.setMonth(proximoVencimento.getMonth() + 1);
         }
 
-        const inicial = dataInicial ? new Date(dataInicial) : null
-        const final = dataFinal ? new Date(dataFinal) : null
+        const inicial = dataInicial ? new Date(dataInicial) : null;
+        const final = dataFinal ? new Date(dataFinal) : null;
 
-        if (inicial && proximoVencimento < inicial) return false
-        if (final && proximoVencimento > final) return false
-        return true
-      })
+        if (inicial && proximoVencimento < inicial) return false;
+        if (final && proximoVencimento > final) return false;
+        return true;
+      });
     }
 
     // Filtro por status
     if (statusFiltro) {
-      resultado = resultado.filter(gastoFixo => {
-        const status = calcularStatus(gastoFixo)
-        return status === statusFiltro
-      })
+      resultado = resultado.filter((gastoFixo) => {
+        const status = calcularStatus(gastoFixo);
+        return status === statusFiltro;
+      });
     }
 
     // Ordenar por dia de vencimento (mais próximo primeiro no mês atual)
-    const hoje = new Date()
-    const diaAtual = hoje.getDate()
+    const hoje = new Date();
+    const diaAtual = hoje.getDate();
 
     resultado.sort((a, b) => {
       // Calcular distância até o próximo vencimento
       const calcularDistancia = (diaVencimento) => {
         if (diaVencimento >= diaAtual) {
-          return diaVencimento - diaAtual // Vencimento ainda neste mês
+          return diaVencimento - diaAtual; // Vencimento ainda neste mês
         } else {
-          return (30 - diaAtual) + diaVencimento // Vencimento no próximo mês
+          return 30 - diaAtual + diaVencimento; // Vencimento no próximo mês
         }
-      }
+      };
 
-      const distanciaA = calcularDistancia(a.diaVencimento)
-      const distanciaB = calcularDistancia(b.diaVencimento)
+      const distanciaA = calcularDistancia(a.diaVencimento);
+      const distanciaB = calcularDistancia(b.diaVencimento);
 
-      return distanciaA - distanciaB
-    })
+      return distanciaA - distanciaB;
+    });
 
-    setGastosFixosFiltrados(resultado)
-    setPaginaAtual(1) // Reset para primeira página ao filtrar
-  }, [gastosFixos, dataInicial, dataFinal, statusFiltro, termoPesquisa])
+    setGastosFixosFiltrados(resultado);
+    setPaginaAtual(1); // Reset para primeira página ao filtrar
+  }, [gastosFixos, dataInicial, dataFinal, statusFiltro, termoPesquisa]);
 
   // Calcular paginação
-  const totalPaginas = Math.ceil(gastosFixosFiltrados.length / itensPorPagina)
-  const indiceInicial = (paginaAtual - 1) * itensPorPagina
-  const indiceFinal = indiceInicial + itensPorPagina
-  const gastosFixosExibidos = gastosFixosFiltrados.slice(indiceInicial, indiceFinal)
+  const totalPaginas = Math.ceil(gastosFixosFiltrados.length / itensPorPagina);
+  const indiceInicial = (paginaAtual - 1) * itensPorPagina;
+  const indiceFinal = indiceInicial + itensPorPagina;
+  const gastosFixosExibidos = gastosFixosFiltrados.slice(
+    indiceInicial,
+    indiceFinal,
+  );
 
   const formatarValor = (valor) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(valor)
-  }
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(valor);
+  };
 
   const calcularStatus = (gastoFixo) => {
-    if (gastoFixo.status === 'pago') return 'pago'
+    if (gastoFixo.status === "pago") return "pago";
 
-    const hoje = new Date()
-    const dataVencimento = new Date(gastoFixo.dataVencimento)
+    const hoje = new Date();
+    const dataVencimento = new Date(gastoFixo.dataVencimento);
 
-    const diasParaVencimento = Math.ceil((dataVencimento - hoje) / (1000 * 60 * 60 * 24))
+    const diasParaVencimento = Math.ceil(
+      (dataVencimento - hoje) / (1000 * 60 * 60 * 24),
+    );
 
-    if (diasParaVencimento < 0) return 'atrasado'
-    if (diasParaVencimento <= 3) return 'a_vencer'
-    return 'futuro'
-  }
+    if (diasParaVencimento < 0) return "atrasado";
+    if (diasParaVencimento <= 3) return "a_vencer";
+    return "futuro";
+  };
 
   const getBadgeTipo = (tipo) => {
-    const tipoNormalizado = tipo.toLowerCase()
-      .replace(/ã/g, 'a')
-      .replace(/é/g, 'e')
-      .replace(/\s+/g, '-')
-    return `badge-tipo ${tipoNormalizado}`
-  }
+    const tipoNormalizado = tipo
+      .toLowerCase()
+      .replace(/ã/g, "a")
+      .replace(/é/g, "e")
+      .replace(/\s+/g, "-");
+    return `badge-tipo ${tipoNormalizado}`;
+  };
 
   const getStatusLabel = (status) => {
     const labels = {
-      'pago': 'Pago',
-      'atrasado': 'Atrasado',
-      'a_vencer': 'A Vencer',
-      'futuro': 'Futuro'
-    }
-    return labels[status] || 'A Vencer'
-  }
+      pago: "Pago",
+      atrasado: "Atrasado",
+      a_vencer: "A Vencer",
+      futuro: "Futuro",
+    };
+    return labels[status] || "A Vencer";
+  };
 
   const alterarStatus = async (gastoFixo, novoStatus) => {
     try {
-      const usuarioAuth = JSON.parse(localStorage.getItem('usuario'));
+      const usuarioAuth = JSON.parse(localStorage.getItem("usuario"));
       if (!usuarioAuth || !usuarioAuth.token) {
-        console.error('Token não encontrado')
-        return
+        console.error("Token não encontrado");
+        return;
       }
 
-      const response = await fetch(`http://localhost:5000/api/gastos-fixos/${gastoFixo.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${usuarioAuth.token}`
+      const response = await fetch(
+        `http://localhost:5000/api/gastos-fixos/${gastoFixo.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${usuarioAuth.token}`,
+          },
+          body: JSON.stringify({
+            ...gastoFixo,
+            status: novoStatus,
+          }),
         },
-        body: JSON.stringify({
-          ...gastoFixo,
-          status: novoStatus
-        }),
-      })
+      );
       if (response.ok) {
         // Atualizar o estado no componente pai
         if (setGastosFixos) {
-          const gastosFixosAtualizados = gastosFixos.map(gf => 
-            gf.id === gastoFixo.id ? { ...gf, status: novoStatus } : gf
-          )
-          setGastosFixos(gastosFixosAtualizados)
+          const gastosFixosAtualizados = gastosFixos.map((gf) =>
+            gf.id === gastoFixo.id ? { ...gf, status: novoStatus } : gf,
+          );
+          setGastosFixos(gastosFixosAtualizados);
         }
 
         // Disparar evento para atualizar outros componentes
-        window.dispatchEvent(new CustomEvent('atualizarGastosFixos'))
+        window.dispatchEvent(new CustomEvent("atualizarGastosFixos"));
       }
     } catch (error) {
-      console.error('Erro ao atualizar status:', error)
+      console.error("Erro ao atualizar status:", error);
     }
-  }
+  };
 
   const limparFiltros = () => {
-    setDataInicial('')
-    setDataFinal('')
-    setStatusFiltro('')
-    setTermoPesquisa('')
-  }
+    setDataInicial("");
+    setDataFinal("");
+    setStatusFiltro("");
+    setTermoPesquisa("");
+  };
 
   const irParaPagina = (pagina) => {
     if (pagina >= 1 && pagina <= totalPaginas) {
-      setPaginaAtual(pagina)
+      setPaginaAtual(pagina);
     }
-  }
+  };
 
   // Função para gerar números de páginas com elipses
   const gerarNumerosPaginas = () => {
-    const nums = []
-    const delta = 2 // Quantas páginas mostrar antes e depois da atual
-    
+    const nums = [];
+    const delta = 2; // Quantas páginas mostrar antes e depois da atual
+
     // Sempre incluir primeira página
     if (totalPaginas > 1) {
-      nums.push(1)
+      nums.push(1);
     }
-    
+
     // Calcular início e fim do range central
-    let inicio = Math.max(2, paginaAtual - delta)
-    let fim = Math.min(totalPaginas - 1, paginaAtual + delta)
-    
+    let inicio = Math.max(2, paginaAtual - delta);
+    let fim = Math.min(totalPaginas - 1, paginaAtual + delta);
+
     // Adicionar elipse no início se necessário
     if (inicio > 2) {
-      nums.push('...')
+      nums.push("...");
     }
-    
+
     // Adicionar páginas do range central
     for (let i = inicio; i <= fim; i++) {
       if (i > 1 && i < totalPaginas) {
-        nums.push(i)
+        nums.push(i);
       }
     }
-    
+
     // Adicionar elipse no final se necessário
     if (fim < totalPaginas - 1) {
-      nums.push('...')
+      nums.push("...");
     }
-    
+
     // Sempre incluir última página
     if (totalPaginas > 1) {
-      nums.push(totalPaginas)
+      nums.push(totalPaginas);
     }
-    
-    return nums
-  }
 
-
+    return nums;
+  };
 
   return (
     <div className="card">
@@ -259,20 +273,19 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
               <option value="futuro">🔵 Futuro</option>
             </select>
           </div>
+        </div>
+
+        <div className="controles-linha">
           <button className="btn-limpar-filtros" onClick={limparFiltros}>
             Limpar Filtros
           </button>
-        </div>
 
-        <div className="controles-paginacao">
-          <div className="campo-filtro">
-            <label>Itens por página</label>
+          <div className="controles-paginacao">
+            <label htmlFor="itensPorPagina">Itens por página:</label>
             <select
+              id="itensPorPagina"
               value={itensPorPagina}
-              onChange={(e) => {
-                setItensPorPagina(parseInt(e.target.value))
-                setPaginaAtual(1)
-              }}
+              onChange={(e) => setItensPorPagina(Number(e.target.value))}
               className="select-itens"
             >
               <option value={10}>10</option>
@@ -286,10 +299,9 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
       {gastosFixosFiltrados.length === 0 ? (
         <div className="lista-vazia">
           <div className="sub">
-            {gastosFixos.length === 0 ? 
-              'Nenhum gasto fixo cadastrado ainda.' : 
-              'Nenhum gasto fixo encontrado para o filtro aplicado.'
-            }
+            {gastosFixos.length === 0
+              ? "Nenhum gasto fixo cadastrado ainda."
+              : "Nenhum gasto fixo encontrado para o filtro aplicado."}
           </div>
         </div>
       ) : (
@@ -309,28 +321,37 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
                 </tr>
               </thead>
               <tbody>
-                {gastosFixosExibidos.map(gastoFixo => {
-                  const status = calcularStatus(gastoFixo)
+                {gastosFixosExibidos.map((gastoFixo) => {
+                  const status = calcularStatus(gastoFixo);
                   return (
-                    <tr key={gastoFixo.id} className={`linha-tabela status-${status}`}>
+                    <tr
+                      key={gastoFixo.id}
+                      className={`linha-tabela status-${status}`}
+                    >
                       <td>{gastoFixo.descricao}</td>
-                      <td className="valor-celula">{formatarValor(gastoFixo.valor)}</td>
+                      <td className="valor-celula">
+                        {formatarValor(gastoFixo.valor)}
+                      </td>
                       <td>
                         <span className={getBadgeTipo(gastoFixo.tipo)}>
                           {gastoFixo.tipo}
                         </span>
                       </td>
-                      <td>{new Date(gastoFixo.dataVencimento).toLocaleDateString('pt-BR')}</td>
-                      <td>{gastoFixo.categoria || '-'}</td>
+                      <td>
+                        {new Date(gastoFixo.dataVencimento).toLocaleDateString(
+                          "pt-BR",
+                        )}
+                      </td>
+                      <td>{gastoFixo.categoria || "-"}</td>
                       <td>
                         <div className="status-container">
                           <span className={`badge-status badge-${status}`}>
                             {getStatusLabel(status)}
                           </span>
-                          {status !== 'pago' && (
-                            <button 
+                          {status !== "pago" && (
+                            <button
                               className="btn-pagar"
-                              onClick={() => alterarStatus(gastoFixo, 'pago')}
+                              onClick={() => alterarStatus(gastoFixo, "pago")}
                               title="Marcar como pago"
                             >
                               ✓
@@ -340,37 +361,50 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
                       </td>
                       <td>
                         <div className="acoes-celula">
-                          <button className="btn-acao" onClick={() => onEditar(gastoFixo)}>
+                          <button
+                            className="btn-acao"
+                            onClick={() => onEditar(gastoFixo)}
+                          >
                             <IconeEditar />
                           </button>
-                          <button className="btn-acao btn-excluir" onClick={() => onExcluir(gastoFixo.id)}>
+                          <button
+                            className="btn-acao btn-excluir"
+                            onClick={() => onExcluir(gastoFixo.id)}
+                          >
                             <IconeExcluir />
                           </button>
                         </div>
                       </td>
                     </tr>
-                  )
+                  );
                 })}
               </tbody>
             </table>
 
             {/* Cards Mobile */}
             <div className="tabela-cards">
-              {gastosFixosExibidos.map(gastoFixo => {
-                const status = calcularStatus(gastoFixo)
+              {gastosFixosExibidos.map((gastoFixo) => {
+                const status = calcularStatus(gastoFixo);
                 return (
-                  <div key={gastoFixo.id} className={`card-item status-${status}`}>
+                  <div
+                    key={gastoFixo.id}
+                    className={`card-item status-${status}`}
+                  >
                     <div className="card-header">
-                      <h3 className="card-titulo">
-                        {gastoFixo.descricao}
-                      </h3>
-                      <span className="card-valor">{formatarValor(gastoFixo.valor)}</span>
+                      <h3 className="card-titulo">{gastoFixo.descricao}</h3>
+                      <span className="card-valor">
+                        {formatarValor(gastoFixo.valor)}
+                      </span>
                     </div>
 
                     <div className="card-detalhes">
                       <div className="card-detalhe">
                         <span className="card-detalhe-label">Vencimento</span>
-                        <span className="card-detalhe-valor">{new Date(gastoFixo.dataVencimento).toLocaleDateString('pt-BR')}</span>
+                        <span className="card-detalhe-valor">
+                          {new Date(
+                            gastoFixo.dataVencimento,
+                          ).toLocaleDateString("pt-BR")}
+                        </span>
                       </div>
                       <div className="card-detalhe">
                         <span className="card-detalhe-label">Tipo</span>
@@ -382,7 +416,9 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
                       </div>
                       <div className="card-detalhe">
                         <span className="card-detalhe-label">Categoria</span>
-                        <span className="card-detalhe-valor">{gastoFixo.categoria || '-'}</span>
+                        <span className="card-detalhe-valor">
+                          {gastoFixo.categoria || "-"}
+                        </span>
                       </div>
                       <div className="card-detalhe">
                         <span className="card-detalhe-label">Status</span>
@@ -395,24 +431,30 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
                     </div>
 
                     <div className="card-acoes">
-                      {status !== 'pago' && (
-                        <button 
+                      {status !== "pago" && (
+                        <button
                           className="btn-pagar-card"
-                          onClick={() => alterarStatus(gastoFixo, 'pago')}
+                          onClick={() => alterarStatus(gastoFixo, "pago")}
                           title="Marcar como pago"
                         >
                           ✓
                         </button>
                       )}
-                      <button className="btn-acao" onClick={() => onEditar(gastoFixo)}>
+                      <button
+                        className="btn-acao"
+                        onClick={() => onEditar(gastoFixo)}
+                      >
                         <IconeEditar />
                       </button>
-                      <button className="btn-acao btn-excluir" onClick={() => onExcluir(gastoFixo.id)}>
+                      <button
+                        className="btn-acao btn-excluir"
+                        onClick={() => onExcluir(gastoFixo.id)}
+                      >
                         <IconeExcluir />
                       </button>
                     </div>
                   </div>
-                )
+                );
               })}
             </div>
           </div>
@@ -420,7 +462,7 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
           {/* Paginação */}
           {totalPaginas > 1 && (
             <div className="paginacao">
-              <button 
+              <button
                 className="btn-pagina"
                 onClick={() => irParaPagina(paginaAtual - 1)}
                 disabled={paginaAtual === 1}
@@ -429,22 +471,24 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
               </button>
 
               <div className="numeros-pagina">
-                {gerarNumerosPaginas().map((item, index) => 
-                  item === '...' ? (
-                    <span key={index} className="elipse-paginacao">...</span>
+                {gerarNumerosPaginas().map((item, index) =>
+                  item === "..." ? (
+                    <span key={index} className="elipse-paginacao">
+                      ...
+                    </span>
                   ) : (
                     <button
                       key={item}
-                      className={`btn-numero-pagina ${paginaAtual === item ? 'ativo' : ''}`}
+                      className={`btn-numero-pagina ${paginaAtual === item ? "ativo" : ""}`}
                       onClick={() => irParaPagina(item)}
                     >
                       {item}
                     </button>
-                  )
+                  ),
                 )}
               </div>
 
-              <button 
+              <button
                 className="btn-pagina"
                 onClick={() => irParaPagina(paginaAtual + 1)}
                 disabled={paginaAtual === totalPaginas}
@@ -455,10 +499,12 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
           )}
 
           <div className="info-paginacao">
-            Mostrando {indiceInicial + 1} a {Math.min(indiceFinal, gastosFixosFiltrados.length)} de {gastosFixosFiltrados.length} itens
+            Mostrando {indiceInicial + 1} a{" "}
+            {Math.min(indiceFinal, gastosFixosFiltrados.length)} de{" "}
+            {gastosFixosFiltrados.length} itens
           </div>
         </>
       )}
     </div>
-  )
+  );
 }
