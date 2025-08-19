@@ -291,38 +291,60 @@ export default function App() {
   const salvarGasto = async (gasto) => {
     try {
       const usuarioAuth = JSON.parse(localStorage.getItem('usuario'));
-      if (!usuarioAuth || !usuarioAuth.token) return;
+      if (!usuarioAuth?.token) {
+        setToast({ tipo: 'erro', mensagem: 'Token de autenticação não encontrado' });
+        return;
+      }
 
-      if (gastoEdicao) {
-        const response = await fetch(`${API_BASE_URL}/gastos/${gasto.id}`, {
+      const config = {
+        headers: {
+          'Authorization': `Bearer ${usuarioAuth.token}`,
+          'Content-Type': 'application/json'
+        }
+      };
+
+      if (gasto.id) {
+        // Editar gasto existente
+        const response = await fetch(`http://localhost:5000/api/gastos/${gasto.id}`, {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${usuarioAuth.token}`
-          },
-          body: JSON.stringify(gasto),
-        })
+          headers: config.headers,
+          body: JSON.stringify(gasto)
+        });
+
         if (response.ok) {
-          const gastoAtualizado = await response.json()
-          setGastos(gastos.map(g => g.id === gasto.id ? gastoAtualizado : g))
-          setGastoEdicao(null)
+          const gastoAtualizado = await response.json();
+          setGastos(gastos.map(g => g.id === gasto.id ? gastoAtualizado : g));
+          setGastoEdicao(null);
+          setToast({ tipo: 'sucesso', mensagem: 'Gasto atualizado com sucesso!' });
+        } else {
+          throw new Error('Erro ao atualizar gasto');
         }
       } else {
-        const response = await fetch(`${API_BASE_URL}/gastos`, {
+        // Criar novo gasto
+        const response = await fetch('http://localhost:5000/api/gastos', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${usuarioAuth.token}`
-          },
-          body: JSON.stringify(gasto),
-        })
+          headers: config.headers,
+          body: JSON.stringify(gasto)
+        });
+
         if (response.ok) {
-          const novoGasto = await response.json()
-          setGastos([...gastos, novoGasto])
+          const novosGastos = await response.json();
+          // novosGastos pode ser um array de gastos (múltiplas parcelas) ou um único gasto
+          const gastosParaAdicionar = Array.isArray(novosGastos) ? novosGastos : [novosGastos];
+          setGastos([...gastos, ...gastosParaAdicionar]);
+
+          const numParcelas = gastosParaAdicionar.length;
+          const mensagem = numParcelas > 1
+            ? `${numParcelas} parcelas cadastradas com sucesso!`
+            : 'Gasto cadastrado com sucesso!';
+          setToast({ tipo: 'sucesso', mensagem });
+        } else {
+          throw new Error('Erro ao criar gasto');
         }
       }
     } catch (error) {
-      console.error('Erro ao salvar gasto:', error)
+      console.error('Erro ao salvar gasto:', error);
+      setToast({ tipo: 'erro', mensagem: 'Erro ao salvar gasto' });
     }
   }
 

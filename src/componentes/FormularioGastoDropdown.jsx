@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react'
 import FormularioGasto from './FormularioGasto.jsx'
 
@@ -21,7 +20,7 @@ export default function FormularioGastoDropdown({ gasto, onSalvar, onCancelar })
         <h4>{gasto ? 'Editar Gasto' : 'Novo Gasto'}</h4>
         <i className={`fas fa-chevron-down dropdown-icon ${aberto ? 'aberto' : ''}`}></i>
       </div>
-      
+
       <div className={`formulario-content ${aberto ? 'aberto' : ''}`}>
         <div className="formulario">
           <FormularioGasto 

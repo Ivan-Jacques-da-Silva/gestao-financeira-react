@@ -96,9 +96,17 @@ export default function FormularioGasto({ gasto, onSalvar, onCancelar }) {
           <input
             type="number"
             min="1"
+            max="60"
             value={formData.parcelas}
             onChange={(e) => setFormData({...formData, parcelas: e.target.value})}
+            placeholder="Número de parcelas"
           />
+          <small style={{fontSize: '12px', color: '#666', marginTop: '4px', display: 'block'}}>
+            {parseInt(formData.parcelas) > 1 ? 
+              `Será criado ${formData.parcelas} registros com valor de R$ ${(parseFloat(formData.valor) / parseInt(formData.parcelas) || 0).toFixed(2)} cada` :
+              'Valor total será lançado em uma única parcela'
+            }
+          </small>
         </div>
         
         <div className="campo">

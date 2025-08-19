@@ -44,20 +44,35 @@ router.post('/', async (req, res) => {
   try {
     const { descricao, valor, tipo, data, parcelas, categoria, status } = req.body
     
-    const gasto = await prisma.gasto.create({
-      data: {
-        descricao,
-        valor: parseFloat(valor),
+    const numeroParcelas = parseInt(parcelas) || 1
+    const valorParcela = parseFloat(valor) / numeroParcelas
+    const dataBase = new Date(data)
+    
+    const gastosParaCriar = []
+    
+    for (let i = 0; i < numeroParcelas; i++) {
+      const dataParcelada = new Date(dataBase)
+      dataParcelada.setMonth(dataParcelada.getMonth() + i)
+      
+      gastosParaCriar.push({
+        descricao: numeroParcelas > 1 ? `${descricao} - Parcela ${i + 1}/${numeroParcelas}` : descricao,
+        valor: valorParcela,
         tipo,
-        data: new Date(data),
-        parcelas: parseInt(parcelas) || 1,
+        data: dataParcelada,
+        parcelas: 1, // Cada item criado é uma única parcela
         categoria,
         status: status || 'a_vencer',
         usuarioId: req.usuario.id
-      }
-    })
+      })
+    }
     
-    res.status(201).json(gasto)
+    const gastosResposta = await Promise.all(
+      gastosParaCriar.map(gastoData =>
+        prisma.gasto.create({ data: gastoData })
+      )
+    )
+    
+    res.status(201).json(gastosResposta)
   } catch (error) {
     res.status(500).json({ error: 'Erro ao criar gasto' })
   }
