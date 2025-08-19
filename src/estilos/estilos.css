@@ -690,7 +690,8 @@ body {
 }
 
 .input-filtro,
-.select-itens {
+.select-itens,
+.select-filtro {
   padding: 10px 14px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
@@ -704,7 +705,8 @@ body {
 }
 
 .input-filtro:focus,
-.select-itens:focus {
+.select-itens:focus,
+.select-filtro:focus {
   outline: none;
   border-color: var(--cor-primaria);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
