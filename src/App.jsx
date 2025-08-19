@@ -14,6 +14,7 @@ import TelaAuth from './componentes/TelaAuth'
 import Header from './componentes/Header'
 import ModalSenha from './componentes/ModalSenha.jsx'
 import ConfiguracaoUsuario from './componentes/ConfiguracaoUsuario.jsx'
+import ToastAlert from './componentes/ToastAlert'; // Importar o ToastAlert
 
 const API_BASE_URL = 'http://localhost:5000/api'
 
@@ -24,6 +25,7 @@ export default function App() {
   const [modalSenhaAberto, setModalSenhaAberto] = useState(false)
   const [carregandoModal, setCarregandoModal] = useState(false)
   const [mostrarConfiguracoes, setMostrarConfiguracoes] = useState(false)
+  const [toast, setToast] = useState({ visivel: false, mensagem: '', tipo: '' }); // Estado para o ToastAlert
 
   // Estados para gastos e parcelas
   const [gastos, setGastos] = useState([])
@@ -142,28 +144,44 @@ export default function App() {
     return meses.map(m => m.valor)
   }, [gastos, gastosFixos])
 
-  // Calcular KPIs reais
+  // Calcular KPIs
   const kpis = React.useMemo(() => {
-    const hoje = new Date()
-    const mesAtual = hoje.getMonth()
-    const anoAtual = hoje.getFullYear()
+    const agora = new Date()
+    const hoje = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate())
+    const mesAtual = agora.getMonth()
+    const anoAtual = agora.getFullYear()
 
-    // Total gastos no cartão de crédito no mês atual
-    const totalCartaoMesAtual = gastos
+    // Função para verificar se é cartão de crédito
+    const isCartaoCredito = (tipo) => {
+      const tipoLower = tipo.toLowerCase()
+      return tipoLower.includes('cartão') || 
+             tipoLower.includes('cartao') || 
+             tipoLower === 'cartão de crédito' ||
+             tipoLower === 'cartao de credito'
+    }
+
+    // Total cartão de crédito do mês atual (gastos variáveis + fixos)
+    const cartaoVariavelMesAtual = gastos
       .filter(g => {
         const dataGasto = new Date(g.data)
-        return g.tipo === 'Cartão de Crédito' &&
-          dataGasto.getMonth() === mesAtual &&
-          dataGasto.getFullYear() === anoAtual
+        return dataGasto.getMonth() === mesAtual &&
+               dataGasto.getFullYear() === anoAtual &&
+               isCartaoCredito(g.tipo)
       })
       .reduce((total, g) => total + Number(g.valor), 0)
+
+    const cartaoFixoMesAtual = gastosFixos
+      .filter(gf => gf.ativo && isCartaoCredito(gf.tipo))
+      .reduce((total, gf) => total + Number(gf.valor), 0)
+
+    const totalCartaoMesAtual = cartaoVariavelMesAtual + cartaoFixoMesAtual
 
     // Total gastos fixos mensais ativos
     const totalGastosFixos = gastosFixos
       .filter(gf => gf.ativo)
       .reduce((total, gf) => total + Number(gf.valor), 0)
 
-    // Média mensal dos últimos 3 meses
+    // Média mensal dos últimos 3 meses (soma gastos + gastos fixos de cada mês)
     const ultimosTresMeses = []
     for (let i = 2; i >= 0; i--) {
       const data = new Date(anoAtual, mesAtual - i, 1)
@@ -174,6 +192,7 @@ export default function App() {
     }
 
     const totalUltimosTresMeses = ultimosTresMeses.reduce((total, periodo) => {
+      // Soma dos gastos variáveis/parcelas do mês
       const gastosDoMes = gastos
         .filter(g => {
           const dataGasto = new Date(g.data)
@@ -182,6 +201,7 @@ export default function App() {
         })
         .reduce((soma, g) => soma + Number(g.valor), 0)
 
+      // Soma dos gastos fixos ativos (considera todos os meses já que são fixos)
       const gastosFixosDoMes = gastosFixos
         .filter(gf => gf.ativo)
         .reduce((soma, gf) => soma + Number(gf.valor), 0)
@@ -191,10 +211,24 @@ export default function App() {
 
     const mediaMensal = totalUltimosTresMeses / 3
 
-    // Pagamentos atrasados (status vencido)
-    const gastosVencidos = gastos.filter(g => g.status === 'vencido')
-    const gastosFixosVencidos = gastosFixos.filter(gf => gf.status === 'vencido')
-    const totalVencidos = [...gastosVencidos, ...gastosFixosVencidos]
+    // Pagamentos atrasados - verificar se passou da data e não foi pago
+    const gastosAtrasados = gastos.filter(g => {
+      if (g.status === 'pago') return false
+      
+      const dataVencimento = new Date(g.data)
+      return dataVencimento < hoje
+    })
+
+    const gastosFixosAtrasados = gastosFixos.filter(gf => {
+      if (!gf.ativo || gf.status === 'pago') return false
+      
+      // Para gastos fixos, considera o dia do vencimento no mês atual
+      const diaVencimento = gf.diaVencimento || 1
+      const dataVencimento = new Date(anoAtual, mesAtual, diaVencimento)
+      return dataVencimento < hoje
+    })
+
+    const totalVencidos = [...gastosAtrasados, ...gastosFixosAtrasados]
       .reduce((total, item) => total + Number(item.valor), 0)
 
     return {
@@ -202,7 +236,7 @@ export default function App() {
       totalGastosFixos,
       mediaMensal,
       totalVencidos,
-      quantidadeVencidos: gastosVencidos.length + gastosFixosVencidos.length
+      quantidadeVencidos: gastosAtrasados.length + gastosFixosAtrasados.length
     }
   }, [gastos, gastosFixos])
 
@@ -386,12 +420,12 @@ export default function App() {
       if (response.ok) {
         const data = await response.json()
         setMostrar(data.mostrarValores)
-        
+
         // Atualizar usuário no localStorage
         const usuarioAtualizado = { ...usuarioAuth, mostrarValores: data.mostrarValores }
         localStorage.setItem('usuario', JSON.stringify(usuarioAtualizado))
         setUsuario(usuarioAtualizado)
-        
+
         setModalSenhaAberto(false)
       } else {
         const errorData = await response.json()
@@ -408,7 +442,9 @@ export default function App() {
   const handleSalvarConfiguracoes = async (dadosUsuario) => {
     try {
       const usuarioAuth = JSON.parse(localStorage.getItem('usuario'));
-      if (!usuarioAuth || !usuarioAuth.token) return;
+      if (!usuarioAuth || !usuarioAuth.token) {
+        throw new Error('Token de autenticação não encontrado');
+      }
 
       const response = await fetch(`${API_BASE_URL}/auth/atualizar-perfil`, {
         method: 'PUT',
@@ -416,26 +452,129 @@ export default function App() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${usuarioAuth.token}`
         },
-        body: JSON.stringify(dadosUsuario),
+        body: JSON.stringify(dadosUsuario)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.erro || 'Erro ao salvar configurações');
+      }
+
+      const dados = await response.json();
+
+      // Atualizar dados do usuário no localStorage
+      const usuarioAtualizado = {
+        ...usuarioAuth,
+        usuario: dados.usuario.usuario,
+        email: dados.usuario.email,
+        telefone: dados.usuario.telefone,
+        cpf: dados.usuario.cpf
+      };
+
+      localStorage.setItem('usuario', JSON.stringify(usuarioAtualizado));
+      setUsuario(usuarioAtualizado);
+      setMostrarConfiguracoes(false);
+
+      // Mostrar toast de sucesso
+      setToast({
+        visivel: true,
+        mensagem: 'Configurações salvas com sucesso!',
+        tipo: 'sucesso'
+      });
+
+    } catch (error) {
+      console.error('Erro ao salvar configurações:', error);
+
+      // Mostrar toast de erro
+      setToast({
+        visivel: true,
+        mensagem: error.message || 'Erro ao salvar configurações',
+        tipo: 'erro'
+      });
+
+      throw error;
+    }
+  }
+
+  const mostrarToast = (mensagem, tipo) => {
+    setToast({ visivel: true, mensagem, tipo });
+  };
+
+  
+
+  const marcarComoPago = async (id) => {
+    try {
+      const usuarioAuth = JSON.parse(localStorage.getItem('usuario'));
+      if (!usuarioAuth || !usuarioAuth.token) {
+        mostrarToast('Sessão expirada. Faça login novamente.', 'erro')
+        setUsuario(null)
+        return
+      }
+
+      const gasto = gastos.find(g => g.id === id)
+      const response = await fetch(`${API_BASE_URL}/gastos/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${usuarioAuth.token}`
+        },
+        body: JSON.stringify({
+          ...gasto,
+          status: 'pago'
+        })
       })
 
       if (response.ok) {
-        const data = await response.json()
-        
-        // Atualizar usuário no localStorage
-        const usuarioAtualizado = { ...usuarioAuth, ...data.usuario }
-        localStorage.setItem('usuario', JSON.stringify(usuarioAtualizado))
-        setUsuario(usuarioAtualizado)
-        
-        setMostrarConfiguracoes(false)
-        alert('Configurações salvas com sucesso!')
+        carregarDados()
+        mostrarToast('Gasto marcado como pago!', 'sucesso')
+      } else if (response.status === 401) {
+        mostrarToast('Sessão expirada. Faça login novamente.', 'erro')
+        setUsuario(null)
+        localStorage.removeItem('usuario')
       } else {
-        const errorData = await response.json()
-        throw new Error(errorData.erro || 'Erro ao salvar configurações')
+        mostrarToast('Erro ao marcar como pago', 'erro')
       }
     } catch (error) {
-      console.error('Erro ao salvar configurações:', error)
-      throw error
+      console.error('Erro ao marcar como pago:', error)
+      mostrarToast('Erro ao marcar como pago', 'erro')
+    }
+  }
+
+  const marcarGastoFixoComoPago = async (id) => {
+    try {
+      const usuarioAuth = JSON.parse(localStorage.getItem('usuario'));
+      if (!usuarioAuth || !usuarioAuth.token) {
+        mostrarToast('Sessão expirada. Faça login novamente.', 'erro')
+        setUsuario(null)
+        return
+      }
+
+      const gastoFixo = gastosFixos.find(g => g.id === id)
+      const response = await fetch(`${API_BASE_URL}/gastos-fixos/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${usuarioAuth.token}`
+        },
+        body: JSON.stringify({
+          ...gastoFixo,
+          status: 'pago'
+        })
+      })
+
+      if (response.ok) {
+        carregarDados()
+        mostrarToast('Gasto fixo marcado como pago!', 'sucesso')
+      } else if (response.status === 401) {
+        mostrarToast('Sessão expirada. Faça login novamente.', 'erro')
+        setUsuario(null)
+        localStorage.removeItem('usuario')
+      } else {
+        mostrarToast('Erro ao marcar gasto fixo como pago', 'erro')
+      }
+    } catch (error) {
+      console.error('Erro ao marcar gasto fixo como pago:', error)
+      mostrarToast('Erro ao marcar gasto fixo como pago', 'erro')
     }
   }
 
@@ -446,10 +585,10 @@ export default function App() {
 
   return (
     <div className="app">
-      <Header 
-        usuario={usuario} 
-        onLogout={handleLogout} 
-        onConfiguracoes={() => setMostrarConfiguracoes(true)} 
+      <Header
+        usuario={usuario}
+        onLogout={handleLogout}
+        onConfiguracoes={() => setMostrarConfiguracoes(true)}
       />
 
       <div className="container">
@@ -565,7 +704,7 @@ export default function App() {
                 subtitulo=""
                 icone={<IconeAlerta />}
               />
-              
+
               {/* Gráficos Mobile - um embaixo do outro */}
               <div className="card">
                 <h4>Distribuição por Tipo de Gasto</h4>
@@ -621,6 +760,7 @@ export default function App() {
                   gastos={gastos}
                   onEditar={editarGasto}
                   onExcluir={excluirGasto}
+                  onMarcarComoPago={marcarComoPago}
                 />
               </div>
             </div>
@@ -639,6 +779,7 @@ export default function App() {
                   gastos={gastos}
                   onEditar={editarGasto}
                   onExcluir={excluirGasto}
+                  onMarcarComoPago={marcarComoPago}
                 />
               </div>
             </div>
@@ -661,6 +802,7 @@ export default function App() {
                   gastosFixos={gastosFixos}
                   onEditar={editarGastoFixo}
                   onExcluir={excluirGastoFixo}
+                  onMarcarComoPago={marcarGastoFixoComoPago}
                 />
               </div>
             </div>
@@ -679,6 +821,7 @@ export default function App() {
                   gastosFixos={gastosFixos}
                   onEditar={editarGastoFixo}
                   onExcluir={excluirGastoFixo}
+                  onMarcarComoPago={marcarGastoFixoComoPago}
                 />
               </div>
             </div>
@@ -704,6 +847,14 @@ export default function App() {
           </div>
         </div>
       )}
+
+      <ToastAlert
+        mensagem={toast.mensagem}
+        tipo={toast.tipo}
+        visivel={toast.visivel}
+        onFechar={() => setToast(prev => ({ ...prev, visivel: false }))}
+        duracao={4000}
+      />
     </div >
   )
 }
