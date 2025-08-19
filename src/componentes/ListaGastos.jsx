@@ -88,10 +88,17 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir }) {
 
   const alterarStatus = async (gasto, novoStatus) => {
     try {
+      const usuarioAuth = JSON.parse(localStorage.getItem('usuario'));
+      if (!usuarioAuth || !usuarioAuth.token) {
+        console.error('Token não encontrado')
+        return
+      }
+
       const response = await fetch(`http://localhost:5000/api/gastos/${gasto.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${usuarioAuth.token}`
         },
         body: JSON.stringify({
           ...gasto,

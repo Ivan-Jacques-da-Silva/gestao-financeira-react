@@ -231,9 +231,8 @@ export default function App() {
         })
         .reduce((soma, g) => soma + Number(g.valor), 0)
 
-      // Soma dos gastos fixos ativos (considera todos os meses já que são fixos)
+      // Soma dos gastos fixos (considera todos os meses já que são fixos)
       const gastosFixosDoMes = gastosFixos
-        .filter(gf => gf.ativo)
         .reduce((soma, gf) => soma + Number(gf.valor), 0)
 
       return total + gastosDoMes + gastosFixosDoMes
@@ -250,7 +249,7 @@ export default function App() {
     })
 
     const gastosFixosAtrasados = gastosFixos.filter(gf => {
-      if (!gf.ativo || gf.status === 'pago') return false
+      if (gf.status === 'pago') return false
 
       // Para gastos fixos, considera o dia do vencimento no mês atual
       const diaVencimento = gf.diaVencimento || 1

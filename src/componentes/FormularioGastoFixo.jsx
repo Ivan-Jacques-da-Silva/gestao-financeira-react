@@ -7,8 +7,7 @@ export default function FormularioGastoFixo({ gastoFixo, onSalvar, onCancelar })
     valor: '',
     tipo: 'Débito Automático',
     diaVencimento: '1',
-    categoria: '',
-    ativo: true
+    categoria: ''
   })
 
   useEffect(() => {
@@ -35,8 +34,7 @@ export default function FormularioGastoFixo({ gastoFixo, onSalvar, onCancelar })
           valor: '',
           tipo: 'Débito Automático',
           diaVencimento: '1',
-          categoria: '',
-          ativo: true
+          categoria: ''
         })
       }
     }

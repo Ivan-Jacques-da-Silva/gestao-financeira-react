@@ -49,7 +49,6 @@ model GastoFixo {
   tipo           String
   diaVencimento  Int
   categoria      String?
-  ativo          Boolean  @default(true)
   status         String   @default("a_vencer")
   usuarioId      Int
   usuario        Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)

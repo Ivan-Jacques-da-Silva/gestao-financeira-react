@@ -109,10 +109,17 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
 
   const alterarStatus = async (gastoFixo, novoStatus) => {
     try {
+      const usuarioAuth = JSON.parse(localStorage.getItem('usuario'));
+      if (!usuarioAuth || !usuarioAuth.token) {
+        console.error('Token não encontrado')
+        return
+      }
+
       const response = await fetch(`http://localhost:5000/api/gastos-fixos/${gastoFixo.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${usuarioAuth.token}`
         },
         body: JSON.stringify({
           ...gastoFixo,
