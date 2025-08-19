@@ -33,6 +33,26 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
       })
     }
 
+    // Ordenar por dia de vencimento (mais próximo primeiro no mês atual)
+    const hoje = new Date()
+    const diaAtual = hoje.getDate()
+    
+    resultado.sort((a, b) => {
+      // Calcular distância até o próximo vencimento
+      const calcularDistancia = (diaVencimento) => {
+        if (diaVencimento >= diaAtual) {
+          return diaVencimento - diaAtual // Vencimento ainda neste mês
+        } else {
+          return (30 - diaAtual) + diaVencimento // Vencimento no próximo mês
+        }
+      }
+      
+      const distanciaA = calcularDistancia(a.diaVencimento)
+      const distanciaB = calcularDistancia(b.diaVencimento)
+      
+      return distanciaA - distanciaB
+    })
+
     setGastosFixosFiltrados(resultado)
     setPaginaAtual(1) // Reset para primeira página ao filtrar
   }, [gastosFixos, dataInicial, dataFinal])

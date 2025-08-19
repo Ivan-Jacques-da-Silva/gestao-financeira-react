@@ -25,6 +25,9 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir }) {
       })
     }
 
+    // Ordenar por data (mais recente primeiro)
+    resultado.sort((a, b) => new Date(b.data) - new Date(a.data))
+
     setGastosFiltrados(resultado)
     setPaginaAtual(1) // Reset para primeira página ao filtrar
   }, [gastos, dataInicial, dataFinal])
