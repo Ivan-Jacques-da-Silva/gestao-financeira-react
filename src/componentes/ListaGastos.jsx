@@ -7,6 +7,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
   const [dataInicial, setDataInicial] = useState('')
   const [dataFinal, setDataFinal] = useState('')
   const [statusFiltro, setStatusFiltro] = useState('')
+  const [termoPesquisa, setTermoPesquisa] = useState('')
   const [gastosFiltrados, setGastosFiltrados] = useState([])
 
   
@@ -14,6 +15,13 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
   // Aplicar filtros quando gastos ou filtros mudarem
   useEffect(() => {
     let resultado = [...gastos]
+
+    // Filtro por pesquisa de descrição
+    if (termoPesquisa) {
+      resultado = resultado.filter(gasto => 
+        gasto.descricao.toLowerCase().includes(termoPesquisa.toLowerCase())
+      )
+    }
 
     // Filtro por data
     if (dataInicial || dataFinal) {
@@ -41,7 +49,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
 
     setGastosFiltrados(resultado)
     setPaginaAtual(1) // Reset para primeira página ao filtrar
-  }, [gastos, dataInicial, dataFinal, statusFiltro])
+  }, [gastos, dataInicial, dataFinal, statusFiltro, termoPesquisa])
 
   // Calcular paginação
   const totalPaginas = Math.ceil(gastosFiltrados.length / itensPorPagina)
@@ -128,12 +136,52 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
     setDataInicial('')
     setDataFinal('')
     setStatusFiltro('')
+    setTermoPesquisa('')
   }
 
   const irParaPagina = (pagina) => {
     if (pagina >= 1 && pagina <= totalPaginas) {
       setPaginaAtual(pagina)
     }
+  }
+
+  // Função para gerar números de páginas com elipses
+  const gerarNumerosPaginas = () => {
+    const nums = []
+    const delta = 2 // Quantas páginas mostrar antes e depois da atual
+    
+    // Sempre incluir primeira página
+    if (totalPaginas > 1) {
+      nums.push(1)
+    }
+    
+    // Calcular início e fim do range central
+    let inicio = Math.max(2, paginaAtual - delta)
+    let fim = Math.min(totalPaginas - 1, paginaAtual + delta)
+    
+    // Adicionar elipse no início se necessário
+    if (inicio > 2) {
+      nums.push('...')
+    }
+    
+    // Adicionar páginas do range central
+    for (let i = inicio; i <= fim; i++) {
+      if (i > 1 && i < totalPaginas) {
+        nums.push(i)
+      }
+    }
+    
+    // Adicionar elipse no final se necessário
+    if (fim < totalPaginas - 1) {
+      nums.push('...')
+    }
+    
+    // Sempre incluir última página
+    if (totalPaginas > 1) {
+      nums.push(totalPaginas)
+    }
+    
+    return nums
   }
 
   return (
@@ -143,6 +191,16 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
       {/* Controles de filtro e paginação */}
       <div className="filtros-container">
         <div className="filtros-data">
+          <div className="campo-filtro">
+            <label>Pesquisar</label>
+            <input
+              type="text"
+              value={termoPesquisa}
+              onChange={(e) => setTermoPesquisa(e.target.value)}
+              placeholder="Pesquisar por descrição..."
+              className="input-filtro"
+            />
+          </div>
           <div className="campo-filtro">
             <label>Data Inicial</label>
             <input
@@ -362,15 +420,19 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
               </button>
 
               <div className="numeros-pagina">
-                {Array.from({ length: totalPaginas }, (_, i) => i + 1).map(pagina => (
-                  <button
-                    key={pagina}
-                    className={`btn-numero-pagina ${paginaAtual === pagina ? 'ativo' : ''}`}
-                    onClick={() => irParaPagina(pagina)}
-                  >
-                    {pagina}
-                  </button>
-                ))}
+                {gerarNumerosPaginas().map((item, index) => 
+                  item === '...' ? (
+                    <span key={index} className="elipse-paginacao">...</span>
+                  ) : (
+                    <button
+                      key={item}
+                      className={`btn-numero-pagina ${paginaAtual === item ? 'ativo' : ''}`}
+                      onClick={() => irParaPagina(item)}
+                    >
+                      {item}
+                    </button>
+                  )
+                )}
               </div>
 
               <button 

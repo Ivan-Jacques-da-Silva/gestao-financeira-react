@@ -597,6 +597,19 @@ body {
 .status-container {
   display: flex;
   align-items: center;
+
+
+.elipse-paginacao {
+  padding: 8px 12px;
+  color: #6b7280;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  cursor: default;
+}
+
   gap: 8px;
 }
 
