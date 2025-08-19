@@ -80,7 +80,6 @@ async function seed() {
     // FIXOS (mês de referência)
     const fixos = fixosAgosto.map(g => ({
       ...g,
-      ativo: true,
       status: 'a_vencer',
       usuarioId,
     }))

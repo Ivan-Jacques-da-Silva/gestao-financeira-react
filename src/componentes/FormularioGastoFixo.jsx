@@ -100,17 +100,6 @@ export default function FormularioGastoFixo({ gastoFixo, onSalvar, onCancelar })
           />
         </div>
         
-        <div className="campo checkbox">
-          <label>
-            <input
-              type="checkbox"
-              checked={formData.ativo}
-              onChange={(e) => setFormData({...formData, ativo: e.target.checked})}
-            />
-            Ativo
-          </label>
-        </div>
-        
         <div className="botoes">
           <button type="submit" className="btn-salvar">
             {gastoFixo ? 'Atualizar' : 'Salvar'}

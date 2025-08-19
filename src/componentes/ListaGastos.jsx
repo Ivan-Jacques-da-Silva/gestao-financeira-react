@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { IconeEditar, IconeExcluir } from './Icones.jsx'
 
-export default function ListaGastos({ gastos = [], onEditar, onExcluir }) {
+export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGastos }) {
   const [itensPorPagina, setItensPorPagina] = useState(10)
   const [paginaAtual, setPaginaAtual] = useState(1)
   const [dataInicial, setDataInicial] = useState('')
   const [dataFinal, setDataFinal] = useState('')
   const [statusFiltro, setStatusFiltro] = useState('')
   const [gastosFiltrados, setGastosFiltrados] = useState([])
+
+  
 
   // Aplicar filtros quando gastos ou filtros mudarem
   useEffect(() => {
@@ -106,6 +108,15 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir }) {
         }),
       })
       if (response.ok) {
+        // Atualizar o estado no componente pai
+        if (setGastos) {
+          const gastosAtualizados = gastos.map(g => 
+            g.id === gasto.id ? { ...g, status: novoStatus } : g
+          )
+          setGastos(gastosAtualizados)
+        }
+        
+        // Disparar evento para atualizar outros componentes
         window.dispatchEvent(new CustomEvent('atualizarGastos'))
       }
     } catch (error) {

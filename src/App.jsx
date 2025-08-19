@@ -56,6 +56,25 @@ export default function App() {
     }
   }, [usuario])
 
+  // Escutar eventos de atualização
+  useEffect(() => {
+    const handleAtualizarGastos = () => {
+      carregarDados()
+    }
+
+    const handleAtualizarGastosFixos = () => {
+      carregarDados()
+    }
+
+    window.addEventListener('atualizarGastos', handleAtualizarGastos)
+    window.addEventListener('atualizarGastosFixos', handleAtualizarGastosFixos)
+
+    return () => {
+      window.removeEventListener('atualizarGastos', handleAtualizarGastos)
+      window.removeEventListener('atualizarGastosFixos', handleAtualizarGastosFixos)
+    }
+  }, [usuario])
+
   const carregarDados = async () => {
     try {
       // Carregar gastos
@@ -100,33 +119,33 @@ export default function App() {
     const agora = new Date()
     const mesAtual = agora.getMonth()
     const anoAtual = agora.getFullYear()
-    
+
     let dadosFiltrados = []
-    
+
     if (periodoGrafico === 'mesAtual') {
       // Filtrar apenas dados do mês atual
       const gastosDoMes = gastos.filter(gasto => {
         const dataGasto = new Date(gasto.data)
         return dataGasto.getMonth() === mesAtual && dataGasto.getFullYear() === anoAtual
       })
-      
-      const gastosFixosDoMes = gastosFixos.filter(gastoFixo => gastoFixo.ativo)
-      
+
+      const gastosFixosDoMes = gastosFixos
+
       dadosFiltrados = [...gastosDoMes, ...gastosFixosDoMes]
     } else {
       // Filtrar dados dos últimos 6 meses
       const seismesesAtras = new Date(anoAtual, mesAtual - 5, 1)
-      
+
       const gastosUltimos6Meses = gastos.filter(gasto => {
         const dataGasto = new Date(gasto.data)
         return dataGasto >= seismesesAtras
       })
-      
-      const gastosFixosUltimos6Meses = gastosFixos.filter(gastoFixo => gastoFixo.ativo)
-      
+
+      const gastosFixosUltimos6Meses = gastosFixos
+
       dadosFiltrados = [...gastosUltimos6Meses, ...gastosFixosUltimos6Meses]
     }
-    
+
     const agrupados = {}
 
     dadosFiltrados.forEach(item => {
@@ -201,14 +220,13 @@ export default function App() {
       .reduce((total, g) => total + Number(g.valor), 0)
 
     const cartaoFixoMesAtual = gastosFixos
-      .filter(gf => gf.ativo && isCartaoCredito(gf.tipo))
+      .filter(gf => isCartaoCredito(gf.tipo))
       .reduce((total, gf) => total + Number(gf.valor), 0)
 
     const totalCartaoMesAtual = cartaoVariavelMesAtual + cartaoFixoMesAtual
 
-    // Total gastos fixos mensais ativos
+    // Total gastos fixos mensais
     const totalGastosFixos = gastosFixos
-      .filter(gf => gf.ativo)
       .reduce((total, gf) => total + Number(gf.valor), 0)
 
     // Média mensal dos últimos 3 meses (soma gastos + gastos fixos de cada mês)
@@ -554,7 +572,10 @@ export default function App() {
       })
 
       if (response.ok) {
-        carregarDados()
+        // Atualiza o estado local para refletir a mudança imediatamente
+        setGastos(prevGastos =>
+          prevGastos.map(g => (g.id === id ? { ...g, status: 'pago' } : g))
+        );
         mostrarToast('Gasto marcado como pago!', 'sucesso')
       } else if (response.status === 401) {
         mostrarToast('Sessão expirada. Faça login novamente.', 'erro')
@@ -592,7 +613,10 @@ export default function App() {
       })
 
       if (response.ok) {
-        carregarDados()
+        // Atualiza o estado local para refletir a mudança imediatamente
+        setGastosFixos(prevGastosFixos =>
+          prevGastosFixos.map(gf => (gf.id === id ? { ...gf, status: 'pago' } : gf))
+        );
         mostrarToast('Gasto fixo marcado como pago!', 'sucesso')
       } else if (response.status === 401) {
         mostrarToast('Sessão expirada. Faça login novamente.', 'erro')
@@ -861,7 +885,7 @@ export default function App() {
                   gastos={gastos}
                   onEditar={editarGasto}
                   onExcluir={excluirGasto}
-                  onMarcarComoPago={marcarComoPago}
+                  setGastos={setGastos}
                 />
               </div>
             </div>
@@ -880,7 +904,7 @@ export default function App() {
                   gastos={gastos}
                   onEditar={editarGasto}
                   onExcluir={excluirGasto}
-                  onMarcarComoPago={marcarComoPago}
+                  setGastos={setGastos}
                 />
               </div>
             </div>
@@ -903,7 +927,7 @@ export default function App() {
                   gastosFixos={gastosFixos}
                   onEditar={editarGastoFixo}
                   onExcluir={excluirGastoFixo}
-                  onMarcarComoPago={marcarGastoFixoComoPago}
+                  setGastosFixos={setGastosFixos}
                 />
               </div>
             </div>
@@ -922,7 +946,7 @@ export default function App() {
                   gastosFixos={gastosFixos}
                   onEditar={editarGastoFixo}
                   onExcluir={excluirGastoFixo}
-                  onMarcarComoPago={marcarGastoFixoComoPago}
+                  setGastosFixos={setGastosFixos}
                 />
               </div>
             </div>

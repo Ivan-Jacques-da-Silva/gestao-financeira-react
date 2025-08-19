@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { IconeEditar, IconeExcluir } from './Icones.jsx'
 
-export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir }) {
+export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir, setGastosFixos }) {
   const [itensPorPagina, setItensPorPagina] = useState(10)
   const [paginaAtual, setPaginaAtual] = useState(1)
   const [dataInicial, setDataInicial] = useState('')
   const [dataFinal, setDataFinal] = useState('')
   const [statusFiltro, setStatusFiltro] = useState('')
   const [gastosFixosFiltrados, setGastosFixosFiltrados] = useState([])
+
+  
 
   // Aplicar filtros quando gastosFixos ou filtros mudarem
   useEffect(() => {
@@ -127,6 +129,15 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
         }),
       })
       if (response.ok) {
+        // Atualizar o estado no componente pai
+        if (setGastosFixos) {
+          const gastosFixosAtualizados = gastosFixos.map(gf => 
+            gf.id === gastoFixo.id ? { ...gf, status: novoStatus } : gf
+          )
+          setGastosFixos(gastosFixosAtualizados)
+        }
+        
+        // Disparar evento para atualizar outros componentes
         window.dispatchEvent(new CustomEvent('atualizarGastosFixos'))
       }
     } catch (error) {
@@ -146,13 +157,7 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
     }
   }
 
-  // Função para exclusão (necessária para o código antigo)
-  const excluirGastoFixo = async (id) => {
-    // Lógica de exclusão aqui, se necessário.
-    // Por enquanto, vamos apenas simular a exclusão e disparar o evento de atualização.
-    console.log(`Excluindo gasto fixo com ID: ${id}`);
-    window.dispatchEvent(new CustomEvent('atualizarGastosFixos'));
-  };
+  
 
   return (
     <div className="card">
@@ -237,7 +242,6 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
                   <th>Tipo</th>
                   <th>Vencimento</th>
                   <th>Categoria</th>
-                  <th>Ativo</th>
                   <th>Status</th>
                   <th>Ações</th>
                 </tr>
@@ -246,11 +250,8 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
                 {gastosFixosExibidos.map(gastoFixo => {
                   const status = calcularStatus(gastoFixo)
                   return (
-                    <tr key={gastoFixo.id} className={`linha-tabela status-${status} ${!gastoFixo.ativo ? 'inativo' : ''}`}>
-                      <td>
-                        {gastoFixo.descricao}
-                        {!gastoFixo.ativo && <span className="badge-inativo">Inativo</span>}
-                      </td>
+                    <tr key={gastoFixo.id} className={`linha-tabela status-${status}`}>
+                      <td>{gastoFixo.descricao}</td>
                       <td className="valor-celula">{formatarValor(gastoFixo.valor)}</td>
                       <td>
                         <span className={getBadgeTipo(gastoFixo.tipo)}>
@@ -260,16 +261,11 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
                       <td>Dia {gastoFixo.diaVencimento}</td>
                       <td>{gastoFixo.categoria || '-'}</td>
                       <td>
-                        <span className={`badge-ativo ${gastoFixo.ativo ? 'ativo' : 'inativo'}`}>
-                          {gastoFixo.ativo ? 'Sim' : 'Não'}
-                        </span>
-                      </td>
-                      <td>
                         <div className="status-container">
                           <span className={`badge-status badge-${status}`}>
                             {getStatusLabel(status)}
                           </span>
-                          {status !== 'pago' && gastoFixo.ativo && (
+                          {status !== 'pago' && (
                             <button 
                               className="btn-pagar"
                               onClick={() => alterarStatus(gastoFixo, 'pago')}
@@ -301,11 +297,10 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
               {gastosFixosExibidos.map(gastoFixo => {
                 const status = calcularStatus(gastoFixo)
                 return (
-                  <div key={gastoFixo.id} className={`card-item status-${status} ${!gastoFixo.ativo ? 'inativo' : ''}`}>
+                  <div key={gastoFixo.id} className={`card-item status-${status}`}>
                     <div className="card-header">
                       <h3 className="card-titulo">
                         {gastoFixo.descricao}
-                        {!gastoFixo.ativo && <span className="badge-inativo">Inativo</span>}
                       </h3>
                       <span className="card-valor">{formatarValor(gastoFixo.valor)}</span>
                     </div>
@@ -338,7 +333,7 @@ export default function ListaGastosFixos({ gastosFixos = [], onEditar, onExcluir
                     </div>
 
                     <div className="card-acoes">
-                      {status !== 'pago' && gastoFixo.ativo && (
+                      {status !== 'pago' && (
                         <button 
                           className="btn-pagar-card"
                           onClick={() => alterarStatus(gastoFixo, 'pago')}
