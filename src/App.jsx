@@ -97,10 +97,39 @@ export default function App() {
 
   // Calcular dados do gráfico de pizza por método de pagamento
   const dadosPizza = React.useMemo(() => {
-    const todosDados = [...gastos, ...gastosFixos]
+    const agora = new Date()
+    const mesAtual = agora.getMonth()
+    const anoAtual = agora.getFullYear()
+    
+    let dadosFiltrados = []
+    
+    if (periodoGrafico === 'mesAtual') {
+      // Filtrar apenas dados do mês atual
+      const gastosDoMes = gastos.filter(gasto => {
+        const dataGasto = new Date(gasto.data)
+        return dataGasto.getMonth() === mesAtual && dataGasto.getFullYear() === anoAtual
+      })
+      
+      const gastosFixosDoMes = gastosFixos.filter(gastoFixo => gastoFixo.ativo)
+      
+      dadosFiltrados = [...gastosDoMes, ...gastosFixosDoMes]
+    } else {
+      // Filtrar dados dos últimos 6 meses
+      const seismesesAtras = new Date(anoAtual, mesAtual - 5, 1)
+      
+      const gastosUltimos6Meses = gastos.filter(gasto => {
+        const dataGasto = new Date(gasto.data)
+        return dataGasto >= seismesesAtras
+      })
+      
+      const gastosFixosUltimos6Meses = gastosFixos.filter(gastoFixo => gastoFixo.ativo)
+      
+      dadosFiltrados = [...gastosUltimos6Meses, ...gastosFixosUltimos6Meses]
+    }
+    
     const agrupados = {}
 
-    todosDados.forEach(item => {
+    dadosFiltrados.forEach(item => {
       const tipo = item.tipo || 'Outros'
       if (!agrupados[tipo]) {
         agrupados[tipo] = 0
@@ -112,7 +141,7 @@ export default function App() {
       rotulo,
       valor
     }))
-  }, [gastos, gastosFixos])
+  }, [gastos, gastosFixos, periodoGrafico])
 
   // Calcular dados do gráfico de linha dos últimos 6 meses
   const dadosLinha = React.useMemo(() => {
@@ -708,8 +737,44 @@ export default function App() {
 
               {/* Gráficos Mobile - um embaixo do outro */}
               <div className="card">
-                <h4>Distribuição por Tipo de Gasto</h4>
-                <div className="sub">Proporção de gastos por método de pagamento</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                  <div>
+                    <h4>Distribuição por Tipo de Gasto</h4>
+                    <div className="sub">Proporção de gastos por método de pagamento</div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <button
+                      onClick={() => setPeriodoGrafico('mesAtual')}
+                      style={{
+                        padding: '4px 8px',
+                        fontSize: '11px',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '4px',
+                        background: periodoGrafico === 'mesAtual' ? '#6366f1' : '#ffffff',
+                        color: periodoGrafico === 'mesAtual' ? '#ffffff' : '#6b7280',
+                        cursor: 'pointer',
+                        fontWeight: '500'
+                      }}
+                    >
+                      Mês Atual
+                    </button>
+                    <button
+                      onClick={() => setPeriodoGrafico('ultimoMes')}
+                      style={{
+                        padding: '4px 8px',
+                        fontSize: '11px',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '4px',
+                        background: periodoGrafico === 'ultimoMes' ? '#6366f1' : '#ffffff',
+                        color: periodoGrafico === 'ultimoMes' ? '#ffffff' : '#6b7280',
+                        cursor: 'pointer',
+                        fontWeight: '500'
+                      }}
+                    >
+                      Últimos 6 Meses
+                    </button>
+                  </div>
+                </div>
                 <div className="area-graficos">
                   <GraficoPizza dados={dadosPizza} esconder={!mostrar} />
                 </div>
@@ -761,7 +826,7 @@ export default function App() {
                         fontWeight: '500'
                       }}
                     >
-                      Último Mês
+                      Últimos 6 Meses
                     </button>
                   </div>
                 </div>
