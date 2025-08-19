@@ -26,6 +26,7 @@ export default function App() {
   const [carregandoModal, setCarregandoModal] = useState(false)
   const [mostrarConfiguracoes, setMostrarConfiguracoes] = useState(false)
   const [toast, setToast] = useState({ visivel: false, mensagem: '', tipo: '' }); // Estado para o ToastAlert
+  const [periodoGrafico, setPeriodoGrafico] = useState('mesAtual') // 'mesAtual' ou 'ultimoMes'
 
   // Estados para gastos e parcelas
   const [gastos, setGastos] = useState([])
@@ -214,14 +215,14 @@ export default function App() {
     // Pagamentos atrasados - verificar se passou da data e não foi pago
     const gastosAtrasados = gastos.filter(g => {
       if (g.status === 'pago') return false
-      
+
       const dataVencimento = new Date(g.data)
       return dataVencimento < hoje
     })
 
     const gastosFixosAtrasados = gastosFixos.filter(gf => {
       if (!gf.ativo || gf.status === 'pago') return false
-      
+
       // Para gastos fixos, considera o dia do vencimento no mês atual
       const diaVencimento = gf.diaVencimento || 1
       const dataVencimento = new Date(anoAtual, mesAtual, diaVencimento)
@@ -500,7 +501,7 @@ export default function App() {
     setToast({ visivel: true, mensagem, tipo });
   };
 
-  
+
 
   const marcarComoPago = async (id) => {
     try {
@@ -726,8 +727,44 @@ export default function App() {
             {/* Desktop Layout - Gráficos lado a lado */}
             <div className="grid" style={{ gridTemplateColumns: 'repeat(12,1fr)', display: 'none' }}>
               <div style={{ gridColumn: 'span 6' }} className="card">
-                <h4>Distribuição por Tipo de Gasto</h4>
-                <div className="sub">Proporção de gastos por método de pagamento</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                  <div>
+                    <h4>Distribuição por Tipo de Gasto</h4>
+                    <div className="sub">Proporção de gastos por método de pagamento</div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <button
+                      onClick={() => setPeriodoGrafico('mesAtual')}
+                      style={{
+                        padding: '4px 8px',
+                        fontSize: '11px',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '4px',
+                        background: periodoGrafico === 'mesAtual' ? '#6366f1' : '#ffffff',
+                        color: periodoGrafico === 'mesAtual' ? '#ffffff' : '#6b7280',
+                        cursor: 'pointer',
+                        fontWeight: '500'
+                      }}
+                    >
+                      Mês Atual
+                    </button>
+                    <button
+                      onClick={() => setPeriodoGrafico('ultimoMes')}
+                      style={{
+                        padding: '4px 8px',
+                        fontSize: '11px',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '4px',
+                        background: periodoGrafico === 'ultimoMes' ? '#6366f1' : '#ffffff',
+                        color: periodoGrafico === 'ultimoMes' ? '#ffffff' : '#6b7280',
+                        cursor: 'pointer',
+                        fontWeight: '500'
+                      }}
+                    >
+                      Último Mês
+                    </button>
+                  </div>
+                </div>
                 <div className="area-graficos">
                   <GraficoPizza dados={dadosPizza} esconder={!mostrar} />
                 </div>

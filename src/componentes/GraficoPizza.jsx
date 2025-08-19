@@ -197,7 +197,7 @@ export default function GraficoPizza({ dados = [], esconder = false }){
   },[dados, esconder])
 
   return (
-    <div style={{ width: '100%', display: 'flex', justifyContent: 'center', position: 'relative' }}>
+    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
       <canvas 
         ref={canvasRef} 
         width="320" 
@@ -206,6 +206,41 @@ export default function GraficoPizza({ dados = [], esconder = false }){
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
       />
+      
+      {/* Legenda */}
+      {dados.length > 0 && (
+        <div style={{ 
+          display: 'flex', 
+          flexWrap: 'wrap', 
+          justifyContent: 'center', 
+          gap: '12px', 
+          marginTop: '16px',
+          maxWidth: '320px'
+        }}>
+          {dados.map((item, index) => (
+            <div 
+              key={item.rotulo}
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '6px',
+                fontSize: '12px',
+                color: '#6b7280'
+              }}
+            >
+              <div 
+                style={{ 
+                  width: '12px', 
+                  height: '12px', 
+                  borderRadius: '2px',
+                  backgroundColor: getCor(item.rotulo, index)
+                }}
+              />
+              <span>{item.rotulo}</span>
+            </div>
+          ))}
+        </div>
+      )}
       
       {/* Tooltip */}
       {tooltip.show && (
