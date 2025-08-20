@@ -16,7 +16,9 @@ import ModalSenha from './componentes/ModalSenha.jsx'
 import ConfiguracaoUsuario from './componentes/ConfiguracaoUsuario.jsx'
 import ToastAlert from './componentes/ToastAlert'; // Importar o ToastAlert
 
-const API_BASE_URL = 'http://localhost:5000/api'
+// const API_BASE_URL = 'http://localhost:5000/api'
+const API_BASE_URL = 'https://api.vision.dev.br'
+
 
 export default function App() {
   const [aba, setAba] = useState('dashboard')

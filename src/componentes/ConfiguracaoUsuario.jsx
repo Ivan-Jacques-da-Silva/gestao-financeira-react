@@ -2,6 +2,7 @@
 import React, { useState } from 'react'
 
 export default function ConfiguracaoUsuario({ usuario, onSalvar, onCancelar }) {
+  const [abaAtiva, setAbaAtiva] = useState('perfil')
   const [dados, setDados] = useState({
     usuario: usuario.usuario || '',
     email: usuario.email || '',
@@ -118,23 +119,21 @@ export default function ConfiguracaoUsuario({ usuario, onSalvar, onCancelar }) {
     }
   }
 
-  return (
-    <div className="configuracao-container">
-      <div className="configuracao-header">
-        <h2>Configurações do Usuário</h2>
-        <button className="btn-fechar" onClick={onCancelar}>
-          <i className="fas fa-times"></i>
-        </button>
-      </div>
+  const renderConteudoAba = () => {
+    switch (abaAtiva) {
+      case 'perfil':
+        return renderFormularioPerfil()
+      case 'whatsapp':
+        return renderIntegracaoWhatsApp()
+      case 'planos':
+        return renderPlanos()
+      default:
+        return renderFormularioPerfil()
+    }
+  }
 
-      {erro && (
-        <div className="erro-mensagem">
-          <i className="fas fa-exclamation-triangle"></i>
-          {erro}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="configuracao-form">
+  const renderFormularioPerfil = () => (
+    <form onSubmit={handleSubmit} className="configuracao-form">
         <div className="form-section">
           <h3>Informações Pessoais</h3>
           
@@ -235,6 +234,181 @@ export default function ConfiguracaoUsuario({ usuario, onSalvar, onCancelar }) {
           </button>
         </div>
       </form>
+  )
+
+  const renderIntegracaoWhatsApp = () => (
+    <div className="whatsapp-container">
+      <div className="whatsapp-header">
+        <div className="whatsapp-icon">
+          <i className="fab fa-whatsapp"></i>
+        </div>
+        <div>
+          <h3>Integração WhatsApp</h3>
+          <p>Conecte seu WhatsApp para análise automática de gastos com IA</p>
+        </div>
+      </div>
+
+      <div className="whatsapp-status">
+        <div className="status-badge desconectado">
+          <i className="fas fa-times-circle"></i>
+          Desconectado
+        </div>
+      </div>
+
+      <div className="whatsapp-features">
+        <h4>Recursos disponíveis:</h4>
+        <div className="features-list">
+          <div className="feature-item">
+            <i className="fas fa-robot"></i>
+            <div>
+              <strong>Análise automática com IA</strong>
+              <p>Nossa IA analisa suas mensagens e identifica gastos automaticamente</p>
+            </div>
+          </div>
+          <div className="feature-item">
+            <i className="fas fa-chart-line"></i>
+            <div>
+              <strong>Categorização inteligente</strong>
+              <p>Gastos são categorizados automaticamente baseado no contexto</p>
+            </div>
+          </div>
+          <div className="feature-item">
+            <i className="fas fa-clock"></i>
+            <div>
+              <strong>Registro em tempo real</strong>
+              <p>Cadastro instantâneo de gastos enviados pelo WhatsApp</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="whatsapp-upgrade">
+        <div className="upgrade-card">
+          <i className="fas fa-crown"></i>
+          <h4>Recurso Premium</h4>
+          <p>A integração com WhatsApp está disponível apenas no plano Professional. Faça upgrade para desbloquear este recurso.</p>
+          <button className="btn-upgrade" onClick={() => setAbaAtiva('planos')}>
+            Ver Planos
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderPlanos = () => (
+    <div className="planos-container">
+      <div className="planos-header">
+        <h3>Escolha seu Plano</h3>
+        <p>Selecione o plano que melhor atende às suas necessidades</p>
+      </div>
+
+      <div className="plano-atual">
+        <div className="plano-card demo">
+          <div className="plano-badge">Plano Atual</div>
+          <h4>Demo Gratuito</h4>
+          <div className="plano-preco">
+            <span className="preco">Grátis</span>
+            <span className="periodo">30 dias</span>
+          </div>
+          <ul className="plano-recursos">
+            <li><i className="fas fa-check"></i> Recursos básicos de gestão</li>
+            <li><i className="fas fa-check"></i> Relatórios limitados</li>
+            <li><i className="fas fa-times"></i> Sem integração WhatsApp</li>
+            <li><i className="fas fa-times"></i> Sem análise com IA</li>
+          </ul>
+          <div className="tempo-restante">
+            <i className="fas fa-clock"></i>
+            15 dias restantes
+          </div>
+        </div>
+      </div>
+
+      <div className="planos-grid">
+        <div className="plano-card essencial">
+          <h4>Essencial</h4>
+          <div className="plano-preco">
+            <span className="preco">R$ 19,90</span>
+            <span className="periodo">/mês</span>
+          </div>
+          <ul className="plano-recursos">
+            <li><i className="fas fa-check"></i> Gestão completa de gastos</li>
+            <li><i className="fas fa-check"></i> Relatórios avançados</li>
+            <li><i className="fas fa-check"></i> Gráficos e análises</li>
+            <li><i className="fas fa-check"></i> Backup automático</li>
+            <li><i className="fas fa-times"></i> Sem integração WhatsApp</li>
+            <li><i className="fas fa-times"></i> Sem análise com IA</li>
+          </ul>
+          <button className="btn-plano">
+            Escolher Essencial
+          </button>
+        </div>
+
+        <div className="plano-card professional popular">
+          <div className="popular-badge">Mais Popular</div>
+          <h4>Professional</h4>
+          <div className="plano-preco">
+            <span className="preco">R$ 39,90</span>
+            <span className="periodo">/mês</span>
+          </div>
+          <ul className="plano-recursos">
+            <li><i className="fas fa-check"></i> Todos os recursos do Essencial</li>
+            <li><i className="fas fa-check"></i> Integração WhatsApp</li>
+            <li><i className="fas fa-check"></i> Análise automática com IA</li>
+            <li><i className="fas fa-check"></i> Categorização inteligente</li>
+            <li><i className="fas fa-check"></i> Suporte prioritário</li>
+            <li><i className="fas fa-check"></i> Relatórios personalizados</li>
+          </ul>
+          <button className="btn-plano destaque">
+            Escolher Professional
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+
+  return (
+    <div className="configuracao-container">
+      <div className="configuracao-header">
+        <h2>Configurações</h2>
+        <button className="btn-fechar" onClick={onCancelar}>
+          <i className="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div className="configuracao-tabs">
+        <button 
+          className={`tab-btn ${abaAtiva === 'perfil' ? 'ativo' : ''}`}
+          onClick={() => setAbaAtiva('perfil')}
+        >
+          <i className="fas fa-user"></i>
+          Perfil
+        </button>
+        <button 
+          className={`tab-btn ${abaAtiva === 'whatsapp' ? 'ativo' : ''}`}
+          onClick={() => setAbaAtiva('whatsapp')}
+        >
+          <i className="fab fa-whatsapp"></i>
+          WhatsApp
+        </button>
+        <button 
+          className={`tab-btn ${abaAtiva === 'planos' ? 'ativo' : ''}`}
+          onClick={() => setAbaAtiva('planos')}
+        >
+          <i className="fas fa-crown"></i>
+          Planos
+        </button>
+      </div>
+
+      {erro && (
+        <div className="erro-mensagem">
+          <i className="fas fa-exclamation-triangle"></i>
+          {erro}
+        </div>
+      )}
+
+      <div className="configuracao-conteudo">
+        {renderConteudoAba()}
+      </div>
     </div>
   )
 }

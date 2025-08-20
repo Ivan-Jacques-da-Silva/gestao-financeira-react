@@ -5,7 +5,7 @@ export default function TelaAuth({ onLogin }) {
   const [modo, setModo] = useState('login') // 'login' ou 'registro'
   const [carregando, setCarregando] = useState(false)
   const [erro, setErro] = useState('')
-  
+
   // Estados para controlar visibilidade das senhas
   const [mostrarSenha, setMostrarSenha] = useState(false)
   const [mostrarSenhaRegistro, setMostrarSenhaRegistro] = useState(false)
@@ -32,7 +32,7 @@ export default function TelaAuth({ onLogin }) {
     setErro('')
 
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('https://api.vision.dev.br/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -42,6 +42,7 @@ export default function TelaAuth({ onLogin }) {
           senha
         })
       })
+
 
       if (response.ok) {
         const data = await response.json()
@@ -83,17 +84,18 @@ export default function TelaAuth({ onLogin }) {
         cpf: removerMascara(dadosRegistro.cpf),
         telefone: removerMascara(dadosRegistro.telefone)
       }
-      
+
       // Remover confirmação de senha antes de enviar
       delete dadosEnvio.confirmarSenha
 
-      const response = await fetch('/api/auth/registro', {
+      const response = await fetch('https://api.vision.dev.br/api/auth/registro', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(dadosEnvio)
       })
+
 
       if (response.ok) {
         const data = await response.json()
@@ -166,13 +168,13 @@ export default function TelaAuth({ onLogin }) {
         </div>
 
         <div className="auth-tabs">
-          <button 
+          <button
             className={`auth-tab ${modo === 'login' ? 'ativo' : ''}`}
             onClick={() => setModo('login')}
           >
             Login
           </button>
-          <button 
+          <button
             className={`auth-tab ${modo === 'registro' ? 'ativo' : ''}`}
             onClick={() => setModo('registro')}
           >
@@ -222,8 +224,8 @@ export default function TelaAuth({ onLogin }) {
               </div>
             </div>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="auth-botao"
               disabled={carregando}
             >
@@ -350,8 +352,8 @@ export default function TelaAuth({ onLogin }) {
               </select>
             </div>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="auth-botao"
               disabled={carregando}
             >

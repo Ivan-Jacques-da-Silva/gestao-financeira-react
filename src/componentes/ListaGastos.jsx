@@ -10,7 +10,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
   const [termoPesquisa, setTermoPesquisa] = useState('')
   const [gastosFiltrados, setGastosFiltrados] = useState([])
 
-
+  const API_BASE_URL = "https://api.vision.dev.br"
 
   // Aplicar filtros quando gastos ou filtros mudarem
   useEffect(() => {
@@ -104,7 +104,9 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
         return
       }
 
-      const response = await fetch(`http://localhost:5000/api/gastos/${gasto.id}`, {
+      // const response = await fetch(`http://localhost:5000/api/gastos/${gasto.id}`, {
+      const response = await fetch(`${API_BASE_URL}/gastos/${gasto.id}`, {
+
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -232,8 +234,8 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
               <option value="vencido">🔴 Vencido</option>
             </select>
           </div>
-          </div>
-        
+        </div>
+
         <div className="controles-linha">
           <button className="btn-limpar-filtros" onClick={limparFiltros}>
             Limpar Filtros
@@ -253,14 +255,14 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
             </select>
           </div>
         </div>
-        </div>
+      </div>
 
-        
+
       {gastosFiltrados.length === 0 ? (
         <div className="lista-vazia">
           <div className="sub">
-            {gastos.length === 0 ? 
-              'Nenhum gasto cadastrado ainda.' : 
+            {gastos.length === 0 ?
+              'Nenhum gasto cadastrado ainda.' :
               'Nenhum gasto encontrado para o filtro aplicado.'
             }
           </div>
@@ -303,7 +305,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
                             {getStatusLabel(status)}
                           </span>
                           {status !== 'pago' && (
-                            <button 
+                            <button
                               className="btn-pagar"
                               onClick={() => alterarStatus(gasto, 'pago')}
                               title="Marcar como pago"
@@ -380,7 +382,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
                         <div className="card-detalhe">
                           <span className="card-detalhe-label">Ação</span>
                           <span className="card-detalhe-valor">
-                            <button 
+                            <button
                               className="btn-pagar"
                               onClick={() => alterarStatus(gasto, 'pago')}
                               title="Marcar como pago"
@@ -409,7 +411,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
           {/* Paginação */}
           {totalPaginas > 1 && (
             <div className="paginacao">
-              <button 
+              <button
                 className="btn-pagina"
                 onClick={() => irParaPagina(paginaAtual - 1)}
                 disabled={paginaAtual === 1}
@@ -418,7 +420,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
               </button>
 
               <div className="numeros-pagina">
-                {gerarNumerosPaginas().map((item, index) => 
+                {gerarNumerosPaginas().map((item, index) =>
                   item === '...' ? (
                     <span key={index} className="elipse-paginacao">...</span>
                   ) : (
@@ -433,7 +435,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
                 )}
               </div>
 
-              <button 
+              <button
                 className="btn-pagina"
                 onClick={() => irParaPagina(paginaAtual + 1)}
                 disabled={paginaAtual === totalPaginas}

@@ -15,6 +15,8 @@ export default function ListaGastosFixos({
   const [termoPesquisa, setTermoPesquisa] = useState("");
   const [gastosFixosFiltrados, setGastosFixosFiltrados] = useState([]);
 
+  const API_BASE_URL = "https://api.vision.dev.br"
+
   // Aplicar filtros quando gastosFixos ou filtros mudarem
   useEffect(() => {
     let resultado = [...gastosFixos];
@@ -142,7 +144,8 @@ export default function ListaGastosFixos({
       }
 
       const response = await fetch(
-        `http://localhost:5000/api/gastos-fixos/${gastoFixo.id}`,
+        // `http://localhost:5000/api/gastos-fixos/${gastoFixo.id}`,
+        `${API_BASE_URL}/gastos-fixos/${gastoFixo.id}`,
         {
           method: "PUT",
           headers: {
