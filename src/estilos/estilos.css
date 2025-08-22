@@ -1894,6 +1894,78 @@ body {
   }
 }
 
+/* Sistema de filtros colapsáveis para mobile */
+.filtros-toggle-mobile {
+  display: none;
+  margin-bottom: 12px;
+}
+
+.btn-toggle-filtros {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--cor-primaria);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  box-shadow: 0 2px 4px rgba(22, 160, 133, 0.2);
+}
+
+.btn-toggle-filtros:hover {
+  background: var(--cor-primaria-escura);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(22, 160, 133, 0.3);
+}
+
+.btn-toggle-filtros i {
+  font-size: 14px;
+}
+
+.filtros-ativos-indicator {
+  color: #fbbf24;
+  font-size: 18px;
+  margin-left: 4px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Estados dos filtros para mobile */
+@media (max-width: 768px) {
+  .filtros-toggle-mobile {
+    display: block;
+  }
+  
+  .filtros-container.filtros-ocultos {
+    display: none;
+  }
+  
+  .filtros-container.filtros-visiveis {
+    display: flex;
+    animation: slideDown 0.3s ease-out;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Responsividade para mobile */
 @media (max-width: 768px) {
   .toast-alert {

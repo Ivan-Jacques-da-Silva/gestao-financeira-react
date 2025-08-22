@@ -14,6 +14,7 @@ export default function ListaGastosFixos({
   const [statusFiltro, setStatusFiltro] = useState("");
   const [termoPesquisa, setTermoPesquisa] = useState("");
   const [gastosFixosFiltrados, setGastosFixosFiltrados] = useState([]);
+  const [filtrosVisiveis, setFiltrosVisiveis] = useState(false);
 
   const API_BASE_URL = "https://api.vision.dev.br"
 
@@ -246,8 +247,22 @@ export default function ListaGastosFixos({
     <div className="card">
       <h4>Lista de Gastos Fixos ({gastosFixosFiltrados.length})</h4>
 
+      {/* Botão para mostrar/ocultar filtros no mobile */}
+      <div className="filtros-toggle-mobile">
+        <button 
+          className="btn-toggle-filtros"
+          onClick={() => setFiltrosVisiveis(!filtrosVisiveis)}
+        >
+          <i className={`fas ${filtrosVisiveis ? 'fa-times' : 'fa-filter'}`}></i>
+          {filtrosVisiveis ? 'Ocultar Filtros' : 'Filtros'}
+          {(termoPesquisa || dataInicial || dataFinal || statusFiltro) && (
+            <span className="filtros-ativos-indicator">●</span>
+          )}
+        </button>
+      </div>
+
       {/* Controles de filtro e paginação */}
-      <div className="filtros-container">
+      <div className={`filtros-container ${filtrosVisiveis ? 'filtros-visiveis' : 'filtros-ocultos'}`}>
         <div className="filtros-data">
           <div className="campo-filtro">
             <label>Pesquisar</label>
