@@ -366,15 +366,14 @@ export default function ListaGastosFixos({
                           <span className={`badge-status badge-${status}`}>
                             {getStatusLabel(status)}
                           </span>
-                          {status !== "pago" && (
-                            <button
-                              className="btn-pagar"
-                              onClick={() => alterarStatus(gastoFixo, "pago")}
-                              title="Marcar como pago"
-                            >
-                              ✓
-                            </button>
-                          )}
+                          <button
+                            className={`btn-pagar ${status === "pago" ? "pago" : ""}`}
+                            onClick={() => status !== "pago" ? alterarStatus(gastoFixo, "pago") : null}
+                            title={status === "pago" ? "Já está pago" : "Marcar como pago"}
+                            disabled={status === "pago"}
+                          >
+                            <i className={`fas ${status === "pago" ? "fa-check" : "fa-check"}`}></i>
+                          </button>
                         </div>
                       </td>
                       <td>
@@ -449,15 +448,15 @@ export default function ListaGastosFixos({
                     </div>
 
                     <div className="card-acoes">
-                      {status !== "pago" && (
-                        <button
-                          className="btn-pagar-card"
-                          onClick={() => alterarStatus(gastoFixo, "pago")}
-                          title="Marcar como pago"
-                        >
-                          ✓
-                        </button>
-                      )}
+                      <button
+                        className={`btn-pagar-card ${status === "pago" ? "pago" : ""}`}
+                        onClick={() => status !== "pago" ? alterarStatus(gastoFixo, "pago") : null}
+                        title={status === "pago" ? "Já está pago" : "Marcar como pago"}
+                        disabled={status === "pago"}
+                      >
+                        <i className={`fas ${status === "pago" ? "fa-check" : "fa-check"}`}></i>
+                        {status === "pago" ? " Pago" : " Marcar"}
+                      </button>
                       <button
                         className="btn-acao"
                         onClick={() => onEditar(gastoFixo)}
