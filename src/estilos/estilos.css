@@ -2875,6 +2875,50 @@ body {
   border: 1px solid #f5c6cb;
 }
 
+/* Cores de fundo das linhas por status */
+.linha-tabela.status-pago {
+  background-color: rgba(34, 197, 94, 0.1);
+  border-left: 3px solid #22c55e;
+}
+
+.linha-tabela.status-a_vencer {
+  background-color: rgba(245, 158, 11, 0.1);
+  border-left: 3px solid #f59e0b;
+}
+
+.linha-tabela.status-vencido,
+.linha-tabela.status-atrasado {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-left: 3px solid #ef4444;
+}
+
+.linha-tabela.status-futuro {
+  background-color: rgba(99, 102, 241, 0.05);
+  border-left: 3px solid #6366f1;
+}
+
+/* Cores de fundo para cards mobile */
+.card-item.status-pago {
+  background-color: rgba(34, 197, 94, 0.05);
+  border-left: 4px solid #22c55e;
+}
+
+.card-item.status-a_vencer {
+  background-color: rgba(245, 158, 11, 0.05);
+  border-left: 4px solid #f59e0b;
+}
+
+.card-item.status-vencido,
+.card-item.status-atrasado {
+  background-color: rgba(239, 68, 68, 0.05);
+  border-left: 4px solid #ef4444;
+}
+
+.card-item.status-futuro {
+  background-color: rgba(99, 102, 241, 0.03);
+  border-left: 4px solid #6366f1;
+}
+
 /* Ícones de status para select */
 .select-filtro option[value="pago"]::before {
   content: "🟢 ";
