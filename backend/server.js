@@ -97,7 +97,7 @@ async function findAvailablePort(startPort) {
     if (await isPortAvailable(port)) {
       return port;
     }
-    port++;
+    port++; 
   }
   throw new Error("Nenhuma porta disponível encontrada");
 }
