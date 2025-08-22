@@ -3,33 +3,33 @@ import React, { useEffect, useRef } from "react";
 export default function GraficoPizza({ dados = [], esconder = false }) {
   const canvasRef = useRef(null);
 
-  // Cores modernas e vibrantes
+  // Cores com melhor contraste e distinção
   const getCor = (rotulo, index) => {
     const cores = {
-      "Cartão de Crédito": "#6366f1",
-      "CARTÃO DE CRÉDITO": "#6366f1",
-      "Débito Automático": "#10b981",
-      "DÉBITO AUTOMÁTICO": "#10b981",
-      Pix: "#f59e0b",
-      PIX: "#f59e0b",
-      Dinheiro: "#8b5cf6",
-      DINHEIRO: "#8b5cf6",
-      Transferência: "#ec4899",
-      TRANSFERÊNCIA: "#ec4899",
-      Boleto: "#ef4444",
-      BOLETO: "#ef4444",
+      "Cartão de Crédito": "#1e40af",
+      "CARTÃO DE CRÉDITO": "#1e40af",
+      "Débito Automático": "#166534", 
+      "DÉBITO AUTOMÁTICO": "#166534",
+      Pix: "#92400e",
+      PIX: "#92400e",
+      Dinheiro: "#7c3aed",
+      DINHEIRO: "#7c3aed",
+      Transferência: "#be185d",
+      TRANSFERÊNCIA: "#be185d",
+      Boleto: "#c53030",
+      BOLETO: "#c53030",
     };
 
     // Cores alternativas caso não encontre o tipo específico
     const coresAlternativas = [
-      "#6366f1",
-      "#10b981",
-      "#f59e0b",
-      "#8b5cf6",
-      "#ec4899",
-      "#ef4444",
-      "#06b6d4",
-      "#84cc16",
+      "#1e40af",
+      "#166534",
+      "#92400e",
+      "#7c3aed",
+      "#be185d",
+      "#c53030",
+      "#0891b2",
+      "#65a30d",
     ];
 
     return cores[rotulo] || coresAlternativas[index % coresAlternativas.length];
