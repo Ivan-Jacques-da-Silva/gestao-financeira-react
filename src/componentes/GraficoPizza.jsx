@@ -8,8 +8,8 @@ export default function GraficoPizza({ dados = [], esconder = false }) {
     const cores = {
       "Cartão de Crédito": "#1e40af",
       "CARTÃO DE CRÉDITO": "#1e40af",
-      "Débito Automático": "#166534", 
-      "DÉBITO AUTOMÁTICO": "#166534",
+      "Débito Automático": "#14532d", 
+      "DÉBITO AUTOMÁTICO": "#14532d",
       Pix: "#92400e",
       PIX: "#92400e",
       Dinheiro: "#7c3aed",
@@ -23,7 +23,7 @@ export default function GraficoPizza({ dados = [], esconder = false }) {
     // Cores alternativas caso não encontre o tipo específico
     const coresAlternativas = [
       "#1e40af",
-      "#166534",
+      "#14532d",
       "#92400e",
       "#7c3aed",
       "#be185d",

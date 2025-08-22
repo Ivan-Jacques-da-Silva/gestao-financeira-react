@@ -440,21 +440,21 @@ body {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
-  
+
   .tab-btn {
     white-space: nowrap;
     min-width: fit-content;
   }
-  
+
   .planos-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .whatsapp-header {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .feature-item {
     flex-direction: column;
     text-align: center;
@@ -953,7 +953,7 @@ body {
 }
 
 .badge-tipo.debito-automatico {
-  background: #166534;
+  background: #14532d;
   color: #ffffff;
 }
 
@@ -986,7 +986,7 @@ body {
 
 .badge-tipo.débito-automático,
 .badge-tipo.debito-automatico {
-  background: #166534;
+  background: #14532d;
   color: #ffffff;
 }
 
@@ -1009,7 +1009,7 @@ body {
 
 .status-container {
   display: flex;
-  align-items: center;
+  align-items: center
 
 
 .elipse-paginacao {
@@ -2369,13 +2369,13 @@ body {
     grid-template-columns: 1fr 1fr;
     gap: 10px;
   }
-  
+
   .controles-linha {
     flex-direction: column;
     gap: 12px;
     align-items: stretch;
   }
-  
+
   .controles-paginacao {
     justify-content: space-between;
     width: 100%;
