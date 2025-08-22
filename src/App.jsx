@@ -17,7 +17,7 @@ import ConfiguracaoUsuario from './componentes/ConfiguracaoUsuario.jsx'
 import ToastAlert from './componentes/ToastAlert'; // Importar o ToastAlert
 
 // const API_BASE_URL = 'http://localhost:5000/api'
-const API_BASE_URL = 'https://api.vision.dev.br'
+const API_BASE_URL = 'https://api.vision.dev.br/api'
 
 
 export default function App() {
@@ -305,7 +305,7 @@ export default function App() {
 
       if (gasto.id) {
         // Editar gasto existente
-        const response = await fetch(`http://localhost:5000/api/gastos/${gasto.id}`, {
+        const response = await fetch(`${API_BASE_URL}/gastos/${gasto.id}`, {
           method: 'PUT',
           headers: config.headers,
           body: JSON.stringify(gasto)
@@ -321,7 +321,7 @@ export default function App() {
         }
       } else {
         // Criar novo gasto
-        const response = await fetch('http://localhost:5000/api/gastos', {
+        const response = await fetch(`${API_BASE_URL}/gastos`, {
           method: 'POST',
           headers: config.headers,
           body: JSON.stringify(gasto)

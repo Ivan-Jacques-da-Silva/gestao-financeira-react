@@ -105,7 +105,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
       }
 
       // const response = await fetch(`http://localhost:5000/api/gastos/${gasto.id}`, {
-      const response = await fetch(`${API_BASE_URL}/gastos/${gasto.id}`, {
+      const response = await fetch(`${API_BASE_URL}/gastos/api/${gasto.id}`, {
 
         method: 'PUT',
         headers: {

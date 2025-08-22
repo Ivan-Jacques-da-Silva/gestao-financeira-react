@@ -145,7 +145,7 @@ export default function ListaGastosFixos({
 
       const response = await fetch(
         // `http://localhost:5000/api/gastos-fixos/${gastoFixo.id}`,
-        `${API_BASE_URL}/gastos-fixos/${gastoFixo.id}`,
+        `${API_BASE_URL}/gastos-fixos/api/${gastoFixo.id}`,
         {
           method: "PUT",
           headers: {
