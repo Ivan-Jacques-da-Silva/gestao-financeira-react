@@ -160,8 +160,7 @@ export default function ListaGastosFixos({
       }
 
       const response = await fetch(
-        // `http://localhost:5000/api/gastos-fixos/${gastoFixo.id}`,
-        `${API_BASE_URL}/gastos-fixos/api/${gastoFixo.id}`,
+        `${API_BASE_URL}/api/gastos-fixos/${gastoFixo.id}`,
         {
           method: "PUT",
           headers: {
@@ -375,7 +374,7 @@ export default function ListaGastosFixos({
                           "pt-BR",
                         )}
                       </td>
-                      <td>{gastoFixo.categoria || "-"}</td>
+                      <td>{gastoFixo.categoria ? padronizarTexto(gastoFixo.categoria) : "-"}</td>
                       <td>
                         <div className="status-container">
                           <span className={`badge-status badge-${status}`}>
@@ -450,7 +449,7 @@ export default function ListaGastosFixos({
                       <div className="card-detalhe">
                         <span className="card-detalhe-label">Categoria</span>
                         <span className="card-detalhe-valor">
-                          {gastoFixo.categoria || "-"}
+                          {gastoFixo.categoria ? padronizarTexto(gastoFixo.categoria) : "-"}
                         </span>
                       </div>
                       <div className="card-detalhe">

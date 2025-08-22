@@ -108,8 +108,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
         return
       }
 
-      // const response = await fetch(`http://localhost:5000/api/gastos/${gasto.id}`, {
-      const response = await fetch(`${API_BASE_URL}/gastos/api/${gasto.id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/gastos/${gasto.id}`, {
 
         method: 'PUT',
         headers: {
@@ -311,12 +310,12 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
                       <td className="valor-celula">{formatarValor(gasto.valor)}</td>
                       <td>
                         <span className={getBadgeTipo(gasto.tipo)}>
-                          {gasto.tipo}
+                          {padronizarTexto(gasto.tipo)}
                         </span>
                       </td>
                       <td>{formatarData(gasto.data)}</td>
                       <td>{gasto.parcelas > 1 ? `${gasto.parcelas}x` : '1x'}</td>
-                      <td>{gasto.categoria || '-'}</td>
+                      <td>{gasto.categoria ? padronizarTexto(gasto.categoria) : '-'}</td>
                       <td>
                         <div className="status-container">
                           <span className={`badge-status badge-${status}`}>
@@ -373,7 +372,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
                       </div>
                       <div className="card-detalhe">
                         <span className="card-detalhe-label">Tipo</span>
-                        <span className="card-detalhe-valor">{padronizarTexto(gasto.tipoPagamento)}</span>
+                        <span className="card-detalhe-valor">{padronizarTexto(gasto.tipo)}</span>
                       </div>
                       <div className="card-detalhe">
                         <span className="card-detalhe-label">Data</span>
@@ -396,7 +395,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
                       <div className="card-detalhe">
                         <span className="card-detalhe-label">Categoria</span>
                         <span className="card-detalhe-valor">
-                          {gasto.categoria || '-'}
+                          {gasto.categoria ? padronizarTexto(gasto.categoria) : '-'}
                         </span>
                       </div>
 

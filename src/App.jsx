@@ -151,7 +151,23 @@ export default function App() {
     const agrupados = {}
 
     dadosFiltrados.forEach(item => {
-      const tipo = item.tipo || 'Outros'
+      let tipo = item.tipo || 'Outros'
+      // Padronizar os tipos para o gráfico
+      tipo = tipo.charAt(0).toUpperCase() + tipo.slice(1).toLowerCase()
+      
+      // Mapear variações para tipos consistentes
+      if (tipo.includes('debito') || tipo.includes('débito')) {
+        tipo = 'Débito'
+      } else if (tipo.includes('cartão') || tipo.includes('cartao') || tipo.includes('credito') || tipo.includes('crédito')) {
+        tipo = 'Cartão de crédito'
+      } else if (tipo.includes('dinheiro') || tipo.includes('espécie')) {
+        tipo = 'Dinheiro'
+      } else if (tipo.includes('pix')) {
+        tipo = 'Pix'
+      } else if (tipo.includes('transferencia') || tipo.includes('transferência')) {
+        tipo = 'Transferência'
+      }
+      
       if (!agrupados[tipo]) {
         agrupados[tipo] = 0
       }
