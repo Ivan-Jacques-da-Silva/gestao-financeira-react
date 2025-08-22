@@ -62,25 +62,31 @@ export default function ListaGastosFixos({
       });
     }
 
-    // Ordenar por dia de vencimento (mais próximo primeiro no mês atual)
-    const hoje = new Date();
-    const diaAtual = hoje.getDate();
+    // Ordenar por prioridade de status: atrasado > a_vencer > pago > futuro
+    const prioridadeStatus = {
+      atrasado: 1,
+      a_vencer: 2,
+      pago: 3,
+      futuro: 4,
+    };
 
     resultado.sort((a, b) => {
-      // Calcular distância até o próximo vencimento
-      const calcularDistancia = (diaVencimento) => {
-        if (diaVencimento >= diaAtual) {
-          return diaVencimento - diaAtual; // Vencimento ainda neste mês
-        } else {
-          return 30 - diaAtual + diaVencimento; // Vencimento no próximo mês
-        }
-      };
+      const statusA = calcularStatus(a);
+      const statusB = calcularStatus(b);
 
-      const distanciaA = calcularDistancia(a.diaVencimento);
-      const distanciaB = calcularDistancia(b.diaVencimento);
+      // Primeiro, ordenar por status
+      const prioridadeA = prioridadeStatus[statusA] || 99;
+      const prioridadeB = prioridadeStatus[statusB] || 99;
+      if (prioridadeA !== prioridadeB) {
+        return prioridadeA - prioridadeB;
+      }
 
-      return distanciaA - distanciaB;
+      // Se tiverem o mesmo status, ordenar por data de vencimento
+      const dataA = new Date(a.dataVencimento);
+      const dataB = new Date(b.dataVencimento);
+      return dataA - dataB;
     });
+
 
     setGastosFixosFiltrados(resultado);
     setPaginaAtual(1); // Reset para primeira página ao filtrar
@@ -132,14 +138,20 @@ export default function ListaGastosFixos({
     return "futuro";
   };
 
-  const getBadgeTipo = (tipo) => {
-    const tipoNormalizado = tipo
+  const getBadgeTipo = (tipo = "") => {
+    const normalizado = String(tipo)
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "")
       .toLowerCase()
-      .replace(/ã/g, "a")
-      .replace(/é/g, "e")
       .replace(/\s+/g, "-");
-    return `badge-tipo ${tipoNormalizado}`;
+
+    let classe = normalizado;
+    if (normalizado.includes("debito")) classe = "debito";           // "débito" ou "débito-automatico"
+    if (normalizado === "debito-automatico") classe = "debito";
+
+    return `badge-tipo ${classe}`;
   };
+
 
   const getStatusLabel = (status) => {
     if (!status) return status;
@@ -248,7 +260,7 @@ export default function ListaGastosFixos({
 
       {/* Botão para mostrar/ocultar filtros no mobile */}
       <div className="filtros-toggle-mobile">
-        <button 
+        <button
           className="btn-toggle-filtros"
           onClick={() => setFiltrosVisiveis(!filtrosVisiveis)}
         >

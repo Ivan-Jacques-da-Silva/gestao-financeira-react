@@ -45,8 +45,18 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
       })
     }
 
-    // Ordenar por data (mais recente primeiro)
-    resultado.sort((a, b) => new Date(b.data) - new Date(a.data))
+    // Ordenar por prioridade: vencido > a_vencer > pago
+    const prioridade = { vencido: 1, a_vencer: 2, pago: 3 };
+    resultado.sort((a, b) => {
+      const sa = calcularStatus(a);
+      const sb = calcularStatus(b);
+      const pa = prioridade[sa] ?? 99;
+      const pb = prioridade[sb] ?? 99;
+      if (pa !== pb) return pa - pb;
+      // empate: data mais próxima primeiro
+      return new Date(a.data) - new Date(b.data);
+    });
+
 
     setGastosFiltrados(resultado)
     setPaginaAtual(1) // Reset para primeira página ao filtrar
@@ -80,13 +90,21 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
     return 'a_vencer'
   }
 
-  const getBadgeTipo = (tipo) => {
-    const tipoNormalizado = tipo.toLowerCase()
-      .replace(/ã/g, 'a')
-      .replace(/é/g, 'e')
+  const getBadgeTipo = (tipo = '') => {
+    const normalizado = String(tipo)
+      .normalize('NFD')                 // remove acentos
+      .replace(/\p{Diacritic}/gu, '')
+      .toLowerCase()
       .replace(/\s+/g, '-')
-    return `badge-tipo ${tipoNormalizado}`
+
+    // aliases e fallback
+    let classe = normalizado
+    if (normalizado.includes('debito')) classe = 'debito'
+    if (normalizado === 'debito-automatico') classe = 'debito'
+
+    return `badge-tipo ${classe}`
   }
+
 
   // Padronizar textos de status e tipo de pagamento
   const getStatusLabel = (status) => {
@@ -314,7 +332,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
                         </span>
                       </td>
                       <td>{formatarData(gasto.data)}</td>
-                      <td>{gasto.parcelas > 1 ? `${gasto.parcelas}x` : '1x'}</td>
+                      <td>{gasto.totalParcelas > 1 ? `${gasto.parcelas}/${gasto.totalParcelas}` : '1x'}</td>
                       <td>{gasto.categoria ? padronizarTexto(gasto.categoria) : '-'}</td>
                       <td>
                         <div className="status-container">

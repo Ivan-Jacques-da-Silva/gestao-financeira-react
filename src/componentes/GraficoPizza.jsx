@@ -13,15 +13,17 @@ export default function GraficoPizza({ dados = [], esconder = false }) {
   const getCor = (rotulo, index) => {
     // Normalizar o rótulo para comparação
     const rotuloNormalizado = rotulo.toLowerCase();
-    
+
     const cores = {
       "cartão de crédito": "#1e40af",
-      "débito automático": "#10b981", // Verde mais forte
+      "débito": "#20532dff", // verde militar
+      "débito automático": "#20532dff", // cobre os dois casos
       "pix": "#92400e",
       "dinheiro": "#7c3aed",
       "transferência": "#be185d",
       "boleto": "#c53030",
     };
+
 
     // Cores alternativas caso não encontre o tipo específico
     const coresAlternativas = [
@@ -38,7 +40,7 @@ export default function GraficoPizza({ dados = [], esconder = false }) {
     return cores[rotuloNormalizado] || coresAlternativas[index % coresAlternativas.length];
   };
 
-  
+
 
   useEffect(() => {
     const cv = canvasRef.current;
@@ -163,7 +165,7 @@ export default function GraficoPizza({ dados = [], esconder = false }) {
           {dados.map((item, index) => {
             const total = dados.reduce((s, d) => s + d.valor, 0) || 1;
             const porcentagem = ((item.valor / total) * 100).toFixed(1);
-            
+
             return (
               <div
                 key={item.rotulo}
@@ -190,7 +192,7 @@ export default function GraficoPizza({ dados = [], esconder = false }) {
         </div>
       )}
 
-      
+
     </div>
   );
 }
