@@ -154,7 +154,7 @@ export default function App() {
       let tipo = item.tipo || 'Outros'
       // Padronizar os tipos para o gráfico
       tipo = tipo.charAt(0).toUpperCase() + tipo.slice(1).toLowerCase()
-      
+
       // Mapear variações para tipos consistentes
       if (tipo.includes('debito') || tipo.includes('débito')) {
         tipo = 'Débito'
@@ -167,7 +167,7 @@ export default function App() {
       } else if (tipo.includes('transferencia') || tipo.includes('transferência')) {
         tipo = 'Transferência'
       }
-      
+
       if (!agrupados[tipo]) {
         agrupados[tipo] = 0
       }
@@ -221,10 +221,10 @@ export default function App() {
     // Função para verificar se é cartão de crédito
     const isCartaoCredito = (tipo) => {
       const tipoLower = tipo.toLowerCase()
-      return tipoLower.includes('cartão') || 
-             tipoLower.includes('cartao') || 
-             tipoLower === 'cartão de crédito' ||
-             tipoLower === 'cartao de credito'
+      return tipoLower.includes('cartão') ||
+        tipoLower.includes('cartao') ||
+        tipoLower === 'cartão de crédito' ||
+        tipoLower === 'cartao de credito'
     }
 
     // Total cartão de crédito do mês atual (gastos variáveis + fixos)
@@ -232,8 +232,8 @@ export default function App() {
       .filter(g => {
         const dataGasto = new Date(g.data)
         return dataGasto.getMonth() === mesAtual &&
-               dataGasto.getFullYear() === anoAtual &&
-               isCartaoCredito(g.tipo)
+          dataGasto.getFullYear() === anoAtual &&
+          isCartaoCredito(g.tipo)
       })
       .reduce((total, g) => total + Number(g.valor), 0)
 
@@ -372,25 +372,19 @@ export default function App() {
   }
 
   const excluirGasto = async (id) => {
-    if (confirm('Deseja realmente excluir este gasto?')) {
-      try {
-        const usuarioAuth = JSON.parse(localStorage.getItem('usuario'));
-        if (!usuarioAuth || !usuarioAuth.token) return;
+    try {
+      const usuarioAuth = JSON.parse(localStorage.getItem('usuario'));
+      if (!usuarioAuth || !usuarioAuth.token) return;
 
-        const response = await fetch(`${API_BASE_URL}/gastos/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${usuarioAuth.token}`
-          }
-        })
-        if (response.ok) {
-          setGastos(gastos.filter(g => g.id !== id))
-        }
-      } catch (error) {
-        console.error('Erro ao excluir gasto:', error)
-      }
-    }
-  }
+      const response = await fetch(`${API_BASE_URL}/gastos/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${usuarioAuth.token}` }
+      });
+      if (response.ok) setGastos(gastos.filter(g => g.id !== id));
+    } catch (e) { console.error(e); }
+  };
+
+
 
   const cancelarEdicaoGasto = () => {
     setGastoEdicao(null)
@@ -440,25 +434,18 @@ export default function App() {
   }
 
   const excluirGastoFixo = async (id) => {
-    if (confirm('Deseja realmente excluir este gasto fixo?')) {
-      try {
-        const usuarioAuth = JSON.parse(localStorage.getItem('usuario'));
-        if (!usuarioAuth || !usuarioAuth.token) return;
+    try {
+      const usuarioAuth = JSON.parse(localStorage.getItem('usuario'));
+      if (!usuarioAuth || !usuarioAuth.token) return;
 
-        const response = await fetch(`${API_BASE_URL}/gastos-fixos/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${usuarioAuth.token}`
-          }
-        })
-        if (response.ok) {
-          setGastosFixos(gastosFixos.filter(g => g.id !== id))
-        }
-      } catch (error) {
-        console.error('Erro ao excluir gasto fixo:', error)
-      }
-    }
-  }
+      const response = await fetch(`${API_BASE_URL}/gastos-fixos/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${usuarioAuth.token}` }
+      });
+      if (response.ok) setGastosFixos(gastosFixos.filter(g => g.id !== id));
+    } catch (e) { console.error(e); }
+  };
+
 
   const cancelarEdicaoGastoFixo = () => {
     setGastoFixoEdicao(null)

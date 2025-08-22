@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import ReactDOM from 'react-dom'
 import { IconeEditar, IconeExcluir } from './Icones.jsx'
 
 export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGastos }) {
@@ -10,8 +11,41 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
   const [termoPesquisa, setTermoPesquisa] = useState('')
   const [gastosFiltrados, setGastosFiltrados] = useState([])
   const [filtrosVisiveis, setFiltrosVisiveis] = useState(false)
+  const [modal, setModal] = useState({ aberto: false, titulo: '', mensagem: '', onConfirmar: null });
 
   const API_BASE_URL = "https://api.vision.dev.br"
+
+
+  const abrirModal = ({ titulo, mensagem, onConfirmar }) =>
+    setModal({ aberto: true, titulo, mensagem, onConfirmar });
+
+  const fecharModal = () => setModal({ aberto: false, titulo: '', mensagem: '', onConfirmar: null });
+
+  // 3) TRAVAR SCROLL DO BODY QUANDO MODAL ABRIR
+  // Adicione isso dentro do componente:
+  useEffect(() => {
+    document.body.style.overflow = modal.aberto ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [modal.aberto])
+
+
+  const confirmarPagar = (item) => {
+    abrirModal({
+      titulo: 'Marcar como pago',
+      mensagem: `Confirmar pagamento de "${item.descricao}"?`,
+      onConfirmar: async () => { await alterarStatus(item, 'pago'); fecharModal(); }
+    });
+  };
+
+  const confirmarExcluir = (item, isFixo = false) => {
+    abrirModal({
+      titulo: 'Excluir',
+      mensagem: `Tem certeza que deseja excluir "${item.descricao}"?`,
+      onConfirmar: async () => { onExcluir(item.id); fecharModal(); }
+    });
+  };
+
+
 
   // Aplicar filtros quando gastos ou filtros mudarem
   useEffect(() => {
@@ -342,7 +376,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
                           {status !== 'pago' && (
                             <button
                               className="btn-pagar"
-                              onClick={() => alterarStatus(gasto, 'pago')}
+                              onClick={() => confirmarPagar(gasto)}
                               title="Marcar como pago"
                             >
                               <i className="fas fa-check"></i>
@@ -355,7 +389,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
                           <button className="btn-acao" onClick={() => onEditar(gasto)}>
                             <IconeEditar />
                           </button>
-                          <button className="btn-acao btn-excluir" onClick={() => onExcluir(gasto.id)}>
+                          <button className="btn-acao btn-excluir" onClick={() => confirmarExcluir(gasto)}>
                             <IconeExcluir />
                           </button>
                         </div>
@@ -423,7 +457,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
                           {status !== 'pago' && (
                             <button
                               className="btn-pagar-card"
-                              onClick={() => alterarStatus(gasto, 'pago')}
+                              onClick={() => confirmarPagar(gasto)}
                               title="Marcar como pago"
                             >
                               <i className="fas fa-check"></i>
@@ -437,7 +471,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
                       <button className="btn-acao" onClick={() => onEditar(gasto)}>
                         <IconeEditar />
                       </button>
-                      <button className="btn-acao btn-excluir" onClick={() => onExcluir(gasto.id)}>
+                      <button className="btn-acao btn-excluir" onClick={() => confirmarExcluir(gasto)}>
                         <IconeExcluir />
                       </button>
                     </div>
@@ -446,6 +480,26 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
               })}
             </div>
           </div>
+
+          {modal.aberto && ReactDOM.createPortal(
+            <div className="modal-overlay" onClick={fecharModal}>
+              <div className="modal-caixa" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-topo">
+                  <h5>{modal.titulo}</h5>
+                  <button className="modal-fechar" onClick={fecharModal} aria-label="Fechar">×</button>
+                </div>
+                <div className="modal-corpo">
+                  <p>{modal.mensagem}</p>
+                </div>
+                <div className="modal-rodape">
+                  <button className="btn-cancelar" onClick={fecharModal}>Cancelar</button>
+                  <button className="btn-confirmar" onClick={modal.onConfirmar}>Confirmar</button>
+                </div>
+              </div>
+            </div>,
+            document.body
+          )}
+
 
           {/* Paginação */}
           {totalPaginas > 1 && (
