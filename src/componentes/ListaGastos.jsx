@@ -319,14 +319,15 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
                           <span className={`badge-status badge-${status}`}>
                             {getStatusLabel(status)}
                           </span>
-                          <button
-                            className={`btn-pagar ${status === 'pago' ? 'pago' : ''}`}
-                            onClick={() => status !== 'pago' ? alterarStatus(gasto, 'pago') : null}
-                            title={status === 'pago' ? 'Já está pago' : 'Marcar como pago'}
-                            disabled={status === 'pago'}
-                          >
-                            <i className={`fas ${status === 'pago' ? 'fa-check' : 'fa-check'}`}></i>
-                          </button>
+                          {status !== 'pago' && (
+                            <button
+                              className="btn-pagar"
+                              onClick={() => alterarStatus(gasto, 'pago')}
+                              title="Marcar como pago"
+                            >
+                              <i className="fas fa-check"></i>
+                            </button>
+                          )}
                         </div>
                       </td>
                       <td>
@@ -395,15 +396,15 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
                       <div className="card-detalhe">
                         <span className="card-detalhe-label">Ação</span>
                         <span className="card-detalhe-valor">
-                          <button
-                            className={`btn-pagar-card ${status === 'pago' ? 'pago' : ''}`}
-                            onClick={() => status !== 'pago' ? alterarStatus(gasto, 'pago') : null}
-                            title={status === 'pago' ? 'Já está pago' : 'Marcar como pago'}
-                            disabled={status === 'pago'}
-                          >
-                            <i className={`fas ${status === 'pago' ? 'fa-check' : 'fa-check'}`}></i>
-                            {status === 'pago' ? ' Pago' : ' Marcar'}
-                          </button>
+                          {status !== 'pago' && (
+                            <button
+                              className="btn-pagar-card"
+                              onClick={() => alterarStatus(gasto, 'pago')}
+                              title="Marcar como pago"
+                            >
+                              <i className="fas fa-check"></i>
+                            </button>
+                          )}
                         </span>
                       </div>
                     </div>
