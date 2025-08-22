@@ -109,14 +109,14 @@ export default function ListaGastosFixos({
     const diaAtual = hoje.getDate();
     const mesAtual = hoje.getMonth();
     const anoAtual = hoje.getFullYear();
-    
+
     // Extrair o dia de vencimento da data
     const dataVencimentoOriginal = new Date(gastoFixo.dataVencimento);
     const diaVencimento = dataVencimentoOriginal.getDate();
-    
+
     // Calcular próximo vencimento
     let proximoVencimento = new Date(anoAtual, mesAtual, diaVencimento);
-    
+
     // Se o dia já passou este mês, considerar o próximo mês
     if (proximoVencimento < hoje) {
       proximoVencimento = new Date(anoAtual, mesAtual + 1, diaVencimento);
@@ -142,13 +142,13 @@ export default function ListaGastosFixos({
   };
 
   const getStatusLabel = (status) => {
-    const labels = {
-      pago: "Pago",
-      atrasado: "Atrasado",
-      a_vencer: "A Vencer",
-      futuro: "Futuro",
-    };
-    return labels[status] || "A Vencer";
+    if (!status) return status;
+    return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+  };
+
+  const padronizarTexto = (texto) => {
+    if (!texto) return texto;
+    return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
   };
 
   const alterarStatus = async (gastoFixo, novoStatus) => {
@@ -361,13 +361,13 @@ export default function ListaGastosFixos({
                       key={gastoFixo.id}
                       className={`linha-tabela status-${status}`}
                     >
-                      <td>{gastoFixo.descricao}</td>
+                      <td>{padronizarTexto(gastoFixo.descricao)}</td>
                       <td className="valor-celula">
                         {formatarValor(gastoFixo.valor)}
                       </td>
                       <td>
                         <span className={getBadgeTipo(gastoFixo.tipo)}>
-                          {gastoFixo.tipo}
+                          {padronizarTexto(gastoFixo.tipo)}
                         </span>
                       </td>
                       <td>
@@ -424,7 +424,7 @@ export default function ListaGastosFixos({
                     className={`card-item status-${status}`}
                   >
                     <div className="card-header">
-                      <h3 className="card-titulo">{gastoFixo.descricao}</h3>
+                      <h3 className="card-titulo">{padronizarTexto(gastoFixo.descricao)}</h3>
                       <span className="card-valor">
                         {formatarValor(gastoFixo.valor)}
                       </span>
@@ -443,7 +443,7 @@ export default function ListaGastosFixos({
                         <span className="card-detalhe-label">Tipo</span>
                         <span className="card-detalhe-valor">
                           <span className={getBadgeTipo(gastoFixo.tipo)}>
-                            {gastoFixo.tipo}
+                            {padronizarTexto(gastoFixo.tipo)}
                           </span>
                         </span>
                       </div>

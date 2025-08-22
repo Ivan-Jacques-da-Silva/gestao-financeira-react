@@ -3,27 +3,30 @@ import React, { useEffect, useRef } from "react";
 export default function GraficoPizza({ dados = [], esconder = false }) {
   const canvasRef = useRef(null);
 
+  // Função para padronizar texto: primeira letra maiúscula, resto minúsculo
+  const padronizarTexto = (texto) => {
+    if (!texto) return texto;
+    return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+  };
+
   // Cores com melhor contraste e distinção
   const getCor = (rotulo, index) => {
+    // Normalizar o rótulo para comparação
+    const rotuloNormalizado = rotulo.toLowerCase();
+    
     const cores = {
-      "Cartão de Crédito": "#1e40af",
-      "CARTÃO DE CRÉDITO": "#1e40af",
-      "Débito Automático": "#14532d", 
-      "DÉBITO AUTOMÁTICO": "#14532d",
-      Pix: "#92400e",
-      PIX: "#92400e",
-      Dinheiro: "#7c3aed",
-      DINHEIRO: "#7c3aed",
-      Transferência: "#be185d",
-      TRANSFERÊNCIA: "#be185d",
-      Boleto: "#c53030",
-      BOLETO: "#c53030",
+      "cartão de crédito": "#1e40af",
+      "débito automático": "#10b981", // Verde mais forte
+      "pix": "#92400e",
+      "dinheiro": "#7c3aed",
+      "transferência": "#be185d",
+      "boleto": "#c53030",
     };
 
     // Cores alternativas caso não encontre o tipo específico
     const coresAlternativas = [
       "#1e40af",
-      "#14532d",
+      "#10b981",
       "#92400e",
       "#7c3aed",
       "#be185d",
@@ -32,7 +35,7 @@ export default function GraficoPizza({ dados = [], esconder = false }) {
       "#65a30d",
     ];
 
-    return cores[rotulo] || coresAlternativas[index % coresAlternativas.length];
+    return cores[rotuloNormalizado] || coresAlternativas[index % coresAlternativas.length];
   };
 
   
@@ -180,7 +183,7 @@ export default function GraficoPizza({ dados = [], esconder = false }) {
                     backgroundColor: getCor(item.rotulo, index),
                   }}
                 />
-                <span>{item.rotulo} ({porcentagem}%)</span>
+                <span>{padronizarTexto(item.rotulo)} ({porcentagem}%)</span>
               </div>
             );
           })}

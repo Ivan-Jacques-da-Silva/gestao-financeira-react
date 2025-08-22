@@ -88,14 +88,17 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
     return `badge-tipo ${tipoNormalizado}`
   }
 
+  // Padronizar textos de status e tipo de pagamento
   const getStatusLabel = (status) => {
-    const labels = {
-      'pago': 'Pago',
-      'vencido': 'Vencido',
-      'a_vencer': 'A Vencer'
-    }
-    return labels[status] || 'A Vencer'
-  }
+    if (!status) return status;
+    return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+  };
+
+  const padronizarTexto = (texto) => {
+    if (!texto) return texto;
+    return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+  };
+
 
   const alterarStatus = async (gasto, novoStatus) => {
     try {
@@ -193,7 +196,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
 
       {/* Botão para mostrar/ocultar filtros no mobile */}
       <div className="filtros-toggle-mobile">
-        <button 
+        <button
           className="btn-toggle-filtros"
           onClick={() => setFiltrosVisiveis(!filtrosVisiveis)}
         >
@@ -304,7 +307,7 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
                   const status = calcularStatus(gasto)
                   return (
                     <tr key={gasto.id} className={`linha-tabela status-${status}`}>
-                      <td>{gasto.descricao}</td>
+                      <td>{padronizarTexto(gasto.descricao)}</td>
                       <td className="valor-celula">{formatarValor(gasto.valor)}</td>
                       <td>
                         <span className={getBadgeTipo(gasto.tipo)}>
@@ -354,19 +357,23 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
                   <div key={gasto.id} className={`card-item status-${status}`}>
                     <div className="card-header">
                       <h3 className="card-titulo">
-                        {gasto.descricao}
+                        {padronizarTexto(gasto.descricao)}
                       </h3>
                       <span className="card-valor">{formatarValor(gasto.valor)}</span>
                     </div>
 
                     <div className="card-detalhes">
                       <div className="card-detalhe">
+                        <span className="card-detalhe-label">Descrição</span>
+                        <span className="card-detalhe-valor">{padronizarTexto(gasto.descricao)}</span>
+                      </div>
+                      <div className="card-detalhe">
+                        <span className="card-detalhe-label">Valor</span>
+                        <span className="card-detalhe-valor">R$ {gasto.valor.toFixed(2)}</span>
+                      </div>
+                      <div className="card-detalhe">
                         <span className="card-detalhe-label">Tipo</span>
-                        <span className="card-detalhe-valor">
-                          <span className={getBadgeTipo(gasto.tipo)}>
-                            {gasto.tipo}
-                          </span>
-                        </span>
+                        <span className="card-detalhe-valor">{padronizarTexto(gasto.tipoPagamento)}</span>
                       </div>
                       <div className="card-detalhe">
                         <span className="card-detalhe-label">Data</span>
