@@ -1,7 +1,7 @@
 
 import React from 'react'
 
-export default function Header({ usuario, onLogout, onConfiguracoes }) {
+export default function Header({ usuario, onLogout, onConfiguracoes, temaDark, onToggleTema }) {
   return (
     <header className="header">
       <div className="header-titulo">
@@ -13,6 +13,9 @@ export default function Header({ usuario, onLogout, onConfiguracoes }) {
           <i className="fas fa-user"></i>
           <span className="usuario-nome">Olá, <strong>{usuario.usuario}!</strong></span>
         </div>
+        <button onClick={onToggleTema} className="botao-tema" title={temaDark ? 'Modo Claro' : 'Modo Escuro'}>
+          <i className={`fas ${temaDark ? 'fa-sun' : 'fa-moon'}`}></i>
+        </button>
         <button onClick={onLogout} className="botao-logout">
           <i className="fas fa-sign-out-alt"></i>
           Sair

@@ -29,6 +29,7 @@ export default function App() {
   const [mostrarConfiguracoes, setMostrarConfiguracoes] = useState(false)
   const [toast, setToast] = useState({ visivel: false, mensagem: '', tipo: '' }); // Estado para o ToastAlert
   const [periodoGrafico, setPeriodoGrafico] = useState('mesAtual') // 'mesAtual' ou 'ultimoMes'
+  const [temaDark, setTemaDark] = useState(false)
 
   // Estados para gastos e parcelas
   const [gastos, setGastos] = useState([])
@@ -49,7 +50,22 @@ export default function App() {
         localStorage.removeItem('usuario')
       }
     }
+    
+    // Carregar tema dark do localStorage
+    const temaSalvo = localStorage.getItem('temaDark')
+    if (temaSalvo === 'true') {
+      setTemaDark(true)
+    }
   }, [])
+
+  // Aplicar tema dark no body
+  useEffect(() => {
+    if (temaDark) {
+      document.body.classList.add('tema-dark')
+    } else {
+      document.body.classList.remove('tema-dark')
+    }
+  }, [temaDark])
 
   useEffect(() => {
     if (usuario) {
@@ -572,6 +588,12 @@ export default function App() {
     setToast({ visivel: true, mensagem, tipo });
   };
 
+  const toggleTema = () => {
+    const novoTema = !temaDark
+    setTemaDark(novoTema)
+    localStorage.setItem('temaDark', novoTema.toString())
+  };
+
 
 
   const marcarComoPago = async (id) => {
@@ -667,6 +689,8 @@ export default function App() {
         usuario={usuario}
         onLogout={handleLogout}
         onConfiguracoes={() => setMostrarConfiguracoes(true)}
+        temaDark={temaDark}
+        onToggleTema={toggleTema}
       />
 
       <div className="container">
