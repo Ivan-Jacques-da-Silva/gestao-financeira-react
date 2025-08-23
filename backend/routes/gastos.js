@@ -4,7 +4,7 @@ import prisma from '../prisma/client.js'
 import jwt from 'jsonwebtoken'
 
 const router = express.Router()
-const JWT_SECRET = process.env.JWT_SECRET || 'sua_chave_secreta_muito_segura'
+const JWT_SECRET = process.env.JWT_SECRET
 
 // Middleware de autenticação
 const authenticateToken = (req, res, next) => {
