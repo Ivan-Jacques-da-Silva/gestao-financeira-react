@@ -18,7 +18,7 @@ export default function ListaGastosFixos({
   const [filtrosVisiveis, setFiltrosVisiveis] = useState(false);
   const [modal, setModal] = useState({ aberto: false, titulo: '', mensagem: '', onConfirmar: null });
 
-  const API_BASE_URL = "https://api.vision.dev.br"
+  const API_BASE_URL = "https://api.vision.dev.br/api"
 
   const abrirModal = ({ titulo, mensagem, onConfirmar }) =>
     setModal({ aberto: true, titulo, mensagem, onConfirmar });
@@ -45,7 +45,36 @@ export default function ListaGastosFixos({
     abrirModal({
       titulo: 'Excluir',
       mensagem: `Tem certeza que deseja excluir "${item.descricao}"?`,
-      onConfirmar: async () => { onExcluir(item.id); fecharModal(); }
+      onConfirmar: async () => {
+        try {
+          const usuarioAuth = JSON.parse(localStorage.getItem("usuario"));
+          if (!usuarioAuth || !usuarioAuth.token) {
+            console.error("Token não encontrado");
+            return;
+          }
+
+          const response = await fetch(`${API_BASE_URL}/gastos-fixos/${item.id}`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${usuarioAuth.token}`,
+            },
+          });
+
+          if (response.ok) {
+            // Atualizar o estado no componente pai
+            if (setGastosFixos) {
+              setGastosFixos(gastosFixos.filter((gf) => gf.id !== item.id));
+            }
+            // Disparar evento para atualizar outros componentes
+            window.dispatchEvent(new CustomEvent("atualizarGastosFixos"));
+          } else {
+            console.error("Erro ao excluir gasto fixo:", response.statusText);
+          }
+        } catch (error) {
+          console.error("Erro ao excluir gasto fixo:", error);
+        }
+        fecharModal();
+      }
     });
   };
 
@@ -205,7 +234,7 @@ export default function ListaGastosFixos({
       }
 
       const response = await fetch(
-        `${API_BASE_URL}/api/gastos-fixos/${gastoFixo.id}`,
+        `${API_BASE_URL}/gastos-fixos/${gastoFixo.id}`,
         {
           method: "PUT",
           headers: {
@@ -446,7 +475,7 @@ export default function ListaGastosFixos({
                           </button>
                           <button
                             className="btn-acao btn-excluir"
-                            sonClick={() => confirmarExcluir(gastoFixo, true)}
+                            onClick={() => confirmarExcluir(gastoFixo, true)}
                           >
                             <IconeExcluir />
                           </button>
