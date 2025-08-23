@@ -51,7 +51,7 @@ router.get('/', async (req, res) => {
 // Criar novo gasto
 router.post('/', async (req, res) => {
   try {
-    const { descricao, valor, tipo, data, numParcelas } = req.body
+    const { descricao, valor, tipo, data, numParcelas, categoria } = req.body
 
     if (!descricao || !valor || !tipo || !data) {
       return res.status(400).json({
@@ -88,6 +88,7 @@ router.post('/', async (req, res) => {
             valor: valorParcela,
             tipo,
             data: dataParcelaAtual,
+            categoria: categoria || null,
             status: 'a_vencer',
             parcelas: i + 1,
             totalParcelas: numParcelas,
@@ -107,6 +108,7 @@ router.post('/', async (req, res) => {
           valor: valorNumerico,
           tipo,
           data: dataGasto,
+          categoria: categoria || null,
           status: 'a_vencer',
           usuarioId: req.user.id
         }
@@ -126,7 +128,7 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params
-    const { descricao, valor, tipo, data, status } = req.body
+    const { descricao, valor, tipo, data, status, categoria } = req.body
 
     // Verificar se o gasto pertence ao usuário
     const gastoExistente = await prisma.gasto.findFirst({
@@ -165,6 +167,7 @@ router.put('/:id', async (req, res) => {
       dadosAtualizacao.data = dataGasto
     }
     if (status !== undefined) dadosAtualizacao.status = status
+    if (categoria !== undefined) dadosAtualizacao.categoria = categoria
 
     const gastoAtualizado = await prisma.gasto.update({
       where: { id: parseInt(id) },
