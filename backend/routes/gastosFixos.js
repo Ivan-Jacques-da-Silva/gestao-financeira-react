@@ -38,7 +38,33 @@ router.get("/", async (req, res) => {
       },
     });
 
-    res.json(gastosFixos);
+    // Atualizar status baseado na data de vencimento
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    const gastosFixosComStatus = gastosFixos.map(gasto => {
+      if (gasto.status === "pago") return gasto;
+
+      const dataVencimento = new Date(gasto.dataVencimento);
+      dataVencimento.setHours(0, 0, 0, 0);
+
+      const diasParaVencimento = Math.ceil(
+        (dataVencimento - hoje) / (1000 * 60 * 60 * 24)
+      );
+
+      let novoStatus;
+      if (diasParaVencimento < 0) {
+        novoStatus = "atrasado";
+      } else if (diasParaVencimento === 0 || diasParaVencimento <= 10) {
+        novoStatus = "a_vencer";
+      } else {
+        novoStatus = "futuro";
+      }
+
+      return { ...gasto, status: novoStatus };
+    });
+
+    res.json(gastosFixosComStatus);
   } catch (error) {
     console.error("Erro ao buscar gastos fixos:", error);
     res.status(500).json({

@@ -179,15 +179,15 @@ export default function ListaGastosFixos({
     const dataVencimentoOriginal = new Date(gastoFixo.dataVencimento);
     dataVencimentoOriginal.setHours(0, 0, 0, 0);
 
-    // Para gastos fixos, verificar se a data de vencimento já passou
-    if (dataVencimentoOriginal < hoje) {
-      return "atrasado";
-    }
-
-    // Calcular dias até o vencimento
+    // Calcular dias até o vencimento (pode ser negativo se já passou)
     const diasParaVencimento = Math.ceil(
       (dataVencimentoOriginal - hoje) / (1000 * 60 * 60 * 24),
     );
+
+    // Se a data já passou (dias negativos), é atrasado
+    if (diasParaVencimento < 0) {
+      return "atrasado";
+    }
 
     if (diasParaVencimento === 0) return "a_vencer"; // Vence hoje
     if (diasParaVencimento <= 3) return "a_vencer";  // Próximos 3 dias
