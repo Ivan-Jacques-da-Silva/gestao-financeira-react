@@ -50,7 +50,7 @@ router.get("/", async (req, res) => {
 // Criar novo gasto fixo
 router.post("/", async (req, res) => {
   try {
-    const { descricao, valor, tipo, dataVencimento, observacoes } = req.body;
+    const { descricao, valor, tipo, dataVencimento, categoria } = req.body;
 
     if (!descricao || !valor || !tipo || !dataVencimento) {
       return res.status(400).json({
@@ -78,8 +78,8 @@ router.post("/", async (req, res) => {
         valor: valorNumerico,
         tipo,
         dataVencimento: dataVencimentoGasto,
-        observacoes: observacoes || "",
-        status: "pendente",
+        categoria: categoria || null,
+        status: "a_vencer",
         usuarioId: req.user.id,
       },
     });
@@ -97,7 +97,7 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { descricao, valor, tipo, dataVencimento, observacoes, status } =
+    const { descricao, valor, tipo, dataVencimento, categoria, status } =
       req.body;
 
     // Verificar se o gasto fixo pertence ao usuário
@@ -136,7 +136,7 @@ router.put("/:id", async (req, res) => {
       }
       dadosAtualizacao.dataVencimento = dataVencimentoGasto;
     }
-    if (observacoes !== undefined) dadosAtualizacao.observacoes = observacoes;
+    if (categoria !== undefined) dadosAtualizacao.categoria = categoria;
     if (status !== undefined) dadosAtualizacao.status = status;
 
     const gastoFixoAtualizado = await prisma.gastoFixo.update({

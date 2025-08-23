@@ -174,29 +174,24 @@ export default function ListaGastosFixos({
     if (gastoFixo.status === "pago") return "pago";
 
     const hoje = new Date();
-    const diaAtual = hoje.getDate();
-    const mesAtual = hoje.getMonth();
-    const anoAtual = hoje.getFullYear();
-
-    // Extrair o dia de vencimento da data
+    hoje.setHours(0, 0, 0, 0); // Zerar horas para comparação precisa
+    
     const dataVencimentoOriginal = new Date(gastoFixo.dataVencimento);
-    const diaVencimento = dataVencimentoOriginal.getDate();
+    dataVencimentoOriginal.setHours(0, 0, 0, 0);
 
-    // Calcular próximo vencimento
-    let proximoVencimento = new Date(anoAtual, mesAtual, diaVencimento);
-
-    // Se o dia já passou este mês, considerar o próximo mês
-    if (proximoVencimento < hoje) {
-      proximoVencimento = new Date(anoAtual, mesAtual + 1, diaVencimento);
+    // Para gastos fixos, verificar se a data de vencimento já passou
+    if (dataVencimentoOriginal < hoje) {
+      return "atrasado";
     }
 
+    // Calcular dias até o vencimento
     const diasParaVencimento = Math.ceil(
-      (proximoVencimento - hoje) / (1000 * 60 * 60 * 24),
+      (dataVencimentoOriginal - hoje) / (1000 * 60 * 60 * 24),
     );
 
-    if (diasParaVencimento < 0) return "atrasado";
-    if (diasParaVencimento <= 3) return "a_vencer";
-    if (diasParaVencimento <= 10) return "a_vencer";
+    if (diasParaVencimento === 0) return "a_vencer"; // Vence hoje
+    if (diasParaVencimento <= 3) return "a_vencer";  // Próximos 3 dias
+    if (diasParaVencimento <= 10) return "a_vencer"; // Próximos 10 dias
     return "futuro";
   };
 
