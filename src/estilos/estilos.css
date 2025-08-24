@@ -22,8 +22,13 @@ body.tema-dark {
 }
 
 body.tema-dark .area-graficos {
-  background: #333333;
+  background: #1a1a1a;
   border-color: #404040;
+}
+
+/* Gráfico no tema dark */
+body.tema-dark .area-graficos canvas {
+  filter: brightness(0.9) contrast(1.1);
 }
 
 body.tema-dark .card-kpi h4 {
@@ -324,6 +329,25 @@ body.tema-dark .btn-mostrar:hover {
   border-color: var(--cor-primaria) !important;
 }
 
+/* Menu mobile tema dark */
+body.tema-dark .menu-mobile {
+  background: var(--cor-card) !important;
+  border-top-color: var(--cor-borda) !important;
+}
+
+body.tema-dark .menu-mobile-item {
+  color: var(--cor-subtexto) !important;
+}
+
+body.tema-dark .menu-mobile-item.ativo {
+  color: var(--cor-primaria) !important;
+  background: rgba(22, 160, 133, 0.15) !important;
+}
+
+body.tema-dark .menu-mobile-item span {
+  color: inherit !important;
+}
+
 * {
   box-sizing: border-box
 }
@@ -389,6 +413,21 @@ body {
   color: var(--cor-primaria-escura);
   opacity: 1;
   box-shadow: inset 0 -2px 0 var(--cor-primaria);
+}
+
+/* Tema Dark - Tabs */
+body.tema-dark .tabs {
+  background: #404040 !important;
+  border-color: var(--cor-borda) !important;
+}
+
+body.tema-dark .tab {
+  color: var(--cor-subtexto) !important;
+}
+
+body.tema-dark .tab.ativo {
+  background: var(--cor-card) !important;
+  color: var(--cor-primaria) !important;
 }
 
 /* Configuração - Abas */
@@ -1161,6 +1200,7 @@ body {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
+  table-layout: fixed; /* Força o respeito às larguras definidas */
 }
 
 .tabela th {
@@ -1173,9 +1213,24 @@ body {
 }
 
 .tabela td {
-  padding: 16px 12px;
+  padding: 12px 8px;
   border-bottom: 1px solid #e2e8f0;
   vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tabela td:first-child {
+  white-space: normal; /* Permite quebra na primeira coluna (descrição) */
+  max-width: 0; /* Força o truncamento quando necessário */
+}
+
+.tabela td:nth-child(3) {
+  white-space: normal; /* Permite quebra na coluna Detalhes */
+  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 120px; /* Limita largura para forçar quebra */
 }
 
 .linha-tabela {
@@ -1198,6 +1253,7 @@ body {
 .acoes-celula {
   display: flex;
   gap: 4px;
+  justify-content: flex-start; /* Alinha os botões à esquerda */
 }
 
 .badge-status {
@@ -1257,6 +1313,11 @@ body {
   font-weight: 600;
   text-transform: uppercase;
   display: inline-block;
+  word-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
+  line-height: 1.2;
+  max-width: 100px; /* Limita largura do badge */
 }
 
 .badge-tipo.cartao-credito,
@@ -1602,7 +1663,6 @@ body {
   display: none;
   flex-direction: column;
   gap: 8px;
-  padding: 12px;
 }
 
 .card-item {
@@ -3140,7 +3200,6 @@ body.tema-dark .botao-logout:hover {
   }
 
   .tabela-cards {
-    padding: 8px;
     gap: 6px;
   }
 
@@ -3410,6 +3469,67 @@ body.tema-dark .botao-logout:hover {
   border-radius: 12px;
 }
 
+/* Tema Dark - Linhas de tabela com bordas ao invés de fundo colorido */
+body.tema-dark .linha-tabela.status-pago {
+  background-color: var(--cor-card) !important;
+  border: 2px solid #16a34a !important;
+  border-left: 4px solid #16a34a !important;
+}
+
+body.tema-dark .linha-tabela.status-a_vencer {
+  background-color: var(--cor-card) !important;
+  border: 2px solid #f59e0b !important;
+  border-left: 4px solid #f59e0b !important;
+}
+
+body.tema-dark .linha-tabela.status-vencido,
+body.tema-dark .linha-tabela.status-atrasado {
+  background-color: var(--cor-card) !important;
+  border: 2px solid #ef4444 !important;
+  border-left: 4px solid #ef4444 !important;
+}
+
+body.tema-dark .linha-tabela.status-futuro {
+  background-color: var(--cor-card) !important;
+  border: 2px solid #6366f1 !important;
+  border-left: 4px solid #6366f1 !important;
+}
+
+/* Tema Dark - tabela-cards */
+body.tema-dark .tabela-cards {
+  background: var(--cor-card) !important;
+}
+
+/* Tema Dark - Cards com bordas ao invés de fundo colorido */
+body.tema-dark .card-item.status-pago {
+  background-color: var(--cor-card) !important;
+  border: 2px solid #16a34a !important;
+  border-left: 5px solid #16a34a !important;
+  border-radius: 12px;
+}
+
+body.tema-dark .card-item.status-a_vencer {
+  background-color: var(--cor-card) !important;
+  border: 2px solid #f59e0b !important;
+  border-left: 5px solid #f59e0b !important;
+  border-radius: 12px;
+}
+
+body.tema-dark .card-item.status-vencido,
+body.tema-dark .card-item.status-atrasado {
+  background-color: var(--cor-card) !important;
+  border: 2px solid #ef4444 !important;
+  border-left: 5px solid #ef4444 !important;
+  border-radius: 12px;
+}
+
+body.tema-dark .card-item.status-futuro {
+  background-color: var(--cor-card) !important;
+  border: 2px solid #6366f1 !important;
+  border-left: 5px solid #6366f1 !important;
+  border-radius: 12px;
+}
+
 /* Ícones de status para select */
 .select-filtro option[value="pago"]::before {
   content: "🟢 ";
@@ -3499,6 +3619,7 @@ body.tema-dark .botao-logout:hover {
     transform: translateY(8px);
     opacity: 0
   }
+
 
   to {
     transform: none;

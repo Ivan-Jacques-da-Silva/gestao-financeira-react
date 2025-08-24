@@ -343,14 +343,12 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
             <table className="tabela">
               <thead>
                 <tr>
-                  <th>Descrição</th>
-                  <th>Valor</th>
-                  <th>Tipo</th>
-                  <th>Data</th>
-                  <th>Parcelas</th>
-                  <th>Categoria</th>
-                  <th>Status</th>
-                  <th>Ações</th>
+                  <th style={{ width: '20%' }}>Descrição</th>
+                  <th style={{ width: '15%' }}>Valor</th>
+                  <th style={{ width: '15%' }}>Detalhes</th>
+                  <th style={{ width: '15%' }}>Data</th>
+                  <th style={{ width: '25%' }}>Status</th>
+                  <th style={{ width: '10%' }}>Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -358,19 +356,31 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
                   const status = calcularStatus(gasto)
                   return (
                     <tr key={gasto.id} className={`linha-tabela status-${status}`}>
-                      <td>{padronizarTexto(gasto.descricao)}</td>
+                      <td style={{ maxWidth: '200px' }}>
+                        <div style={{ fontWeight: '600', marginBottom: '2px' }}>
+                          {padronizarTexto(gasto.descricao)}
+                        </div>
+                        {gasto.categoria && (
+                          <div style={{ fontSize: '12px', color: 'var(--cor-subtexto)' }}>
+                            {padronizarTexto(gasto.categoria)}
+                          </div>
+                        )}
+                      </td>
                       <td className="valor-celula">{formatarValor(gasto.valor)}</td>
                       <td>
-                        <span className={getBadgeTipo(gasto.tipo)}>
-                          {padronizarTexto(gasto.tipo)}
-                        </span>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          <span className={getBadgeTipo(gasto.tipo)} style={{ fontSize: '10px', padding: '2px 6px' }}>
+                            {padronizarTexto(gasto.tipo)}
+                          </span>
+                          <span style={{ fontSize: '11px', color: 'var(--cor-subtexto)' }}>
+                            {gasto.totalParcelas > 1 ? `${gasto.parcelas}/${gasto.totalParcelas}` : '1x'}
+                          </span>
+                        </div>
                       </td>
                       <td>{formatarData(gasto.data)}</td>
-                      <td>{gasto.totalParcelas > 1 ? `${gasto.parcelas}/${gasto.totalParcelas}` : '1x'}</td>
-                      <td>{gasto.categoria ? padronizarTexto(gasto.categoria) : '-'}</td>
                       <td>
-                        <div className="status-container">
-                          <span className={`badge-status badge-${status}`}>
+                        <div className="status-container" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span className={`badge-status badge-${status}`} style={{ fontSize: '10px', padding: '2px 6px' }}>
                             {getStatusLabel(status)}
                           </span>
                           {status !== 'pago' && (
@@ -378,18 +388,19 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
                               className="btn-pagar"
                               onClick={() => confirmarPagar(gasto)}
                               title="Marcar como pago"
+                              style={{ minWidth: '24px', minHeight: '24px' }}
                             >
-                              <i className="fas fa-check"></i>
+                              <i className="fas fa-check" style={{ fontSize: '10px' }}></i>
                             </button>
                           )}
                         </div>
                       </td>
                       <td>
-                        <div className="acoes-celula">
-                          <button className="btn-acao" onClick={() => onEditar(gasto)}>
+                        <div className="acoes-celula" style={{ gap: '4px' }}>
+                          <button className="btn-acao" onClick={() => onEditar(gasto)} style={{ minWidth: '28px', minHeight: '28px' }}>
                             <IconeEditar />
                           </button>
-                          <button className="btn-acao btn-excluir" onClick={() => confirmarExcluir(gasto)}>
+                          <button className="btn-acao btn-excluir" onClick={() => confirmarExcluir(gasto)} style={{ minWidth: '28px', minHeight: '28px' }}>
                             <IconeExcluir />
                           </button>
                         </div>
@@ -415,16 +426,12 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
 
                     <div className="card-detalhes">
                       <div className="card-detalhe">
-                        <span className="card-detalhe-label">Descrição</span>
-                        <span className="card-detalhe-valor">{padronizarTexto(gasto.descricao)}</span>
-                      </div>
-                      <div className="card-detalhe">
-                        <span className="card-detalhe-label">Valor</span>
-                        <span className="card-detalhe-valor">R$ {gasto.valor.toFixed(2)}</span>
-                      </div>
-                      <div className="card-detalhe">
                         <span className="card-detalhe-label">Tipo</span>
-                        <span className="card-detalhe-valor">{padronizarTexto(gasto.tipo)}</span>
+                        <span className="card-detalhe-valor">
+                          <span className={getBadgeTipo(gasto.tipo)}>
+                            {padronizarTexto(gasto.tipo)}
+                          </span>
+                        </span>
                       </div>
                       <div className="card-detalhe">
                         <span className="card-detalhe-label">Data</span>
@@ -450,11 +457,10 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
                           {gasto.categoria ? padronizarTexto(gasto.categoria) : '-'}
                         </span>
                       </div>
-
-                      <div className="card-detalhe">
-                        <span className="card-detalhe-label">Ação</span>
-                        <span className="card-detalhe-valor">
-                          {status !== 'pago' && (
+                      {status !== 'pago' && (
+                        <div className="card-detalhe">
+                          <span className="card-detalhe-label">Marcar Pago</span>
+                          <span className="card-detalhe-valor">
                             <button
                               className="btn-pagar-card"
                               onClick={() => confirmarPagar(gasto)}
@@ -462,9 +468,9 @@ export default function ListaGastos({ gastos = [], onEditar, onExcluir, setGasto
                             >
                               <i className="fas fa-check"></i>
                             </button>
-                          )}
-                        </span>
-                      </div>
+                          </span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="card-acoes">

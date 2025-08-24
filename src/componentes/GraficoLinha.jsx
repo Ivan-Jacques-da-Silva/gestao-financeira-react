@@ -3,6 +3,26 @@ import React, { useEffect, useRef } from 'react'
 
 export default function GraficoLinha({ series = [], esconder = false }){
   const canvasRef = useRef(null)
+  const [temaDark, setTemaDark] = React.useState(false)
+
+  // Detectar mudanças no tema
+  useEffect(() => {
+    const checkTheme = () => {
+      setTemaDark(document.body.classList.contains('tema-dark'))
+    }
+    
+    // Verificar tema inicial
+    checkTheme()
+    
+    // Observar mudanças na classe do body
+    const observer = new MutationObserver(checkTheme)
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['class']
+    })
+    
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(()=>{
     const cv = canvasRef.current
@@ -13,14 +33,17 @@ export default function GraficoLinha({ series = [], esconder = false }){
     const chartW = w - padding.left - padding.right
     const chartH = h - padding.top - padding.bottom
     
+    // Usar estado do tema
+    const isDark = temaDark
+    
     ctx.clearRect(0, 0, w, h)
     
     // Fundo do gráfico
-    ctx.fillStyle = '#fafbfc'
+    ctx.fillStyle = isDark ? '#1a1a1a' : '#fafbfc'
     ctx.fillRect(padding.left, padding.top, chartW, chartH)
     
     // Grid horizontal mais sutil
-    ctx.strokeStyle = '#e5e7eb'
+    ctx.strokeStyle = isDark ? '#404040' : '#e5e7eb'
     ctx.lineWidth = 1
     for(let i = 0; i <= 5; i++){
       const y = padding.top + i * (chartH / 5)
@@ -43,7 +66,7 @@ export default function GraficoLinha({ series = [], esconder = false }){
     }
     
     if (series.length === 0) {
-      ctx.fillStyle = '#9ca3af'
+      ctx.fillStyle = isDark ? '#a3a3a3' : '#9ca3af'
       ctx.font = '14px Inter'
       ctx.textAlign = 'center'
       ctx.fillText('Sem dados disponíveis', w/2, h/2)
@@ -120,7 +143,7 @@ export default function GraficoLinha({ series = [], esconder = false }){
       
       // Valor no ponto (se não estiver escondido)
       if (!esconder) {
-        ctx.fillStyle = '#374151'
+        ctx.fillStyle = isDark ? '#e5e5e5' : '#374151'
         ctx.font = '11px Inter'
         ctx.textAlign = 'center'
         const valorFormatado = v >= 1000 
@@ -131,7 +154,7 @@ export default function GraficoLinha({ series = [], esconder = false }){
     })
     
     // Labels dos meses com melhor tipografia
-    ctx.fillStyle = '#6b7280'
+    ctx.fillStyle = isDark ? '#a3a3a3' : '#6b7280'
     ctx.font = '12px Inter'
     ctx.textAlign = 'center'
     const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
@@ -145,7 +168,7 @@ export default function GraficoLinha({ series = [], esconder = false }){
     
     // Valores no eixo Y
     ctx.textAlign = 'right'
-    ctx.fillStyle = '#6b7280'
+    ctx.fillStyle = isDark ? '#a3a3a3' : '#6b7280'
     ctx.font = '11px Inter'
     
     for(let i = 0; i <= 5; i++){
@@ -167,18 +190,18 @@ export default function GraficoLinha({ series = [], esconder = false }){
     ctx.save()
     ctx.translate(15, h/2)
     ctx.rotate(-Math.PI/2)
-    ctx.fillStyle = '#9ca3af'
+    ctx.fillStyle = isDark ? '#a3a3a3' : '#9ca3af'
     ctx.font = '12px Inter'
     ctx.textAlign = 'center'
     ctx.fillText(esconder ? 'Valores' : 'Valor (R$)', 0, 0)
     ctx.restore()
     
-    ctx.fillStyle = '#9ca3af'
+    ctx.fillStyle = isDark ? '#a3a3a3' : '#9ca3af'
     ctx.font = '12px Inter'
     ctx.textAlign = 'center'
     ctx.fillText('Meses', w/2, h - 5)
     
-  }, [series, esconder])
+  }, [series, esconder, temaDark])
 
   return (
     <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>

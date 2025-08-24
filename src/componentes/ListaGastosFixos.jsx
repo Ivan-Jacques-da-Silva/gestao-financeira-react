@@ -412,13 +412,12 @@ export default function ListaGastosFixos({
             <table className="tabela">
               <thead>
                 <tr>
-                  <th>Descrição</th>
-                  <th>Valor</th>
-                  <th>Tipo</th>
-                  <th>Vencimento</th>
-                  <th>Categoria</th>
-                  <th>Status</th>
-                  <th>Ações</th>
+                  <th style={{ width: '25%' }}>Descrição</th>
+                  <th style={{ width: '15%' }}>Valor</th>
+                  <th style={{ width: '15%' }}>Detalhes</th>
+                  <th style={{ width: '15%' }}>Vencimento</th>
+                  <th style={{ width: '18%' }}>Status</th>
+                  <th style={{ width: '12%' }}>Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -429,12 +428,21 @@ export default function ListaGastosFixos({
                       key={gastoFixo.id}
                       className={`linha-tabela status-${status}`}
                     >
-                      <td>{padronizarTexto(gastoFixo.descricao)}</td>
+                      <td style={{ maxWidth: '220px' }}>
+                        <div style={{ fontWeight: '600', marginBottom: '2px' }}>
+                          {padronizarTexto(gastoFixo.descricao)}
+                        </div>
+                        {gastoFixo.categoria && (
+                          <div style={{ fontSize: '12px', color: 'var(--cor-subtexto)' }}>
+                            {padronizarTexto(gastoFixo.categoria)}
+                          </div>
+                        )}
+                      </td>
                       <td className="valor-celula">
                         {formatarValor(gastoFixo.valor)}
                       </td>
                       <td>
-                        <span className={getBadgeTipo(gastoFixo.tipo)}>
+                        <span className={getBadgeTipo(gastoFixo.tipo)} style={{ fontSize: '10px', padding: '2px 6px' }}>
                           {padronizarTexto(gastoFixo.tipo)}
                         </span>
                       </td>
@@ -443,10 +451,9 @@ export default function ListaGastosFixos({
                           "pt-BR",
                         )}
                       </td>
-                      <td>{gastoFixo.categoria ? padronizarTexto(gastoFixo.categoria) : "-"}</td>
                       <td>
-                        <div className="status-container">
-                          <span className={`badge-status badge-${status}`}>
+                        <div className="status-container" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span className={`badge-status badge-${status}`} style={{ fontSize: '10px', padding: '2px 6px' }}>
                             {getStatusLabel(status)}
                           </span>
                           {status !== "pago" && (
@@ -454,23 +461,26 @@ export default function ListaGastosFixos({
                               className="btn-pagar"
                               onClick={() => confirmarPagar(gastoFixo)}
                               title="Marcar como pago"
+                              style={{ minWidth: '24px', minHeight: '24px' }}
                             >
-                              <i className="fas fa-check"></i>
+                              <i className="fas fa-check" style={{ fontSize: '10px' }}></i>
                             </button>
                           )}
                         </div>
                       </td>
                       <td>
-                        <div className="acoes-celula">
+                        <div className="acoes-celula" style={{ gap: '4px' }}>
                           <button
                             className="btn-acao"
                             onClick={() => onEditar(gastoFixo)}
+                            style={{ minWidth: '28px', minHeight: '28px' }}
                           >
                             <IconeEditar />
                           </button>
                           <button
                             className="btn-acao btn-excluir"
                             onClick={() => confirmarExcluir(gastoFixo, true)}
+                            style={{ minWidth: '28px', minHeight: '28px' }}
                           >
                             <IconeExcluir />
                           </button>
@@ -483,7 +493,7 @@ export default function ListaGastosFixos({
             </table>
 
             {/* Cards Mobile */}
-            <div className="tabela-cards">
+            <div className="tabela-cards p-0 m-0">
               {gastosFixosExibidos.map((gastoFixo) => {
                 const status = calcularStatus(gastoFixo);
                 return (
